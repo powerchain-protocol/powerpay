@@ -4,10 +4,10 @@ import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
 const required = [
   'actions.json',
-  'backend/src/payments/engine.ts',
-  'backend/src/http/handler.ts',
-  'services/src/solana/transaction-builder.ts',
-  'services/src/repositories/supabase-rest.ts',
+  'apps/backend/src/payments/engine.ts',
+  'apps/backend/src/http/handler.ts',
+  'components/services/src/solana/transaction-builder.ts',
+  'components/services/src/repositories/supabase-rest.ts',
   'apps/mobile/app/(tabs)/index.tsx',
   'apps/mobile/app/(tabs)/pay.tsx',
   'apps/mobile/app/(tabs)/scan.tsx',
@@ -63,7 +63,7 @@ for (const expected of ['createAttempt', 'markSigned', 'submit', 'reconcile', 'm
   if (!checkout.includes(expected)) throw new Error(`Checkout missing canonical execution stage ${expected}`);
 }
 
-const handler = readFileSync(resolve(root, 'backend/src/http/handler.ts'), 'utf8');
+const handler = readFileSync(resolve(root, 'apps/backend/src/http/handler.ts'), 'utf8');
 for (const expected of ['/api/v1/readiness', '/cancel', '/ledger']) {
   if (!handler.includes(expected)) throw new Error(`Backend missing hardened route ${expected}`);
 }

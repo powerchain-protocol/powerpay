@@ -44,10 +44,10 @@
         "packages/program-clients/src/index.ts"
       ],
       "@powerpay/services": [
-        "services/src/index.ts"
+        "components/services/src/index.ts"
       ],
       "@powerpay/backend": [
-        "backend/src/index.ts"
+        "apps/backend/src/index.ts"
       ],
       "@powerpay/payment-machine": [
         "packages/payment-machine/src/index.ts"

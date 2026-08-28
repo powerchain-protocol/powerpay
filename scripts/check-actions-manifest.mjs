@@ -3,8 +3,8 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const manifest = JSON.parse(readFileSync(resolve(root, 'actions.json'), 'utf8'));
-const source = readFileSync(resolve(root, 'services/src/solana/actions.ts'), 'utf8');
-const handler = readFileSync(resolve(root, 'backend/src/http/handler.ts'), 'utf8');
+const source = readFileSync(resolve(root, 'components/services/src/solana/actions.ts'), 'utf8');
+const handler = readFileSync(resolve(root, 'apps/backend/src/http/handler.ts'), 'utf8');
 
 if (!Array.isArray(manifest.rules) || manifest.rules.length === 0) throw new Error('actions.json must contain rules');
 const required = [

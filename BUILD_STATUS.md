@@ -67,4 +67,13 @@ No screenshot reconstruction is substituted for the source originals.
 
 ## Remaining environment-dependent gates
 
-Full Expo/Next.js/backend/services compilation requires workspace dependency installation. Production release additionally requires exact brand source materialization, real PostgreSQL/Supabase migrations, Clerk/JWKS settings, Helius/RPC credentials, token mint addresses, Pyth feed IDs, fee treasury/quote secrets, real Anchor deployment IDs, Sui package publication and signed native builds.
+Full Expo/Next.js/apps/backend + components/services compilation requires workspace dependency installation. Production release additionally requires exact brand source materialization, real PostgreSQL/Supabase migrations, Clerk/JWKS settings, Helius/RPC credentials, token mint addresses, Pyth feed IDs, fee treasury/quote secrets, real Anchor deployment IDs, Sui package publication and signed native builds.
+
+## Repository relocation — current pass
+
+- `backend/` moved to `apps/backend/`.
+- `services/` moved to `components/services/`.
+- `@powerpay/backend` and `@powerpay/services` package names remain unchanged.
+- `pnpm-workspace.yaml`, root TypeScript aliases, validation scripts, READMEs, and architecture references were updated.
+- Structural/payment/asset/program/Actions checks pass after relocation.
+- `pnpm` is not installed in this execution environment, so dependency-backed package typechecks were not rerun in this pass.

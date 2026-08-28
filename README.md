@@ -21,8 +21,8 @@ apps/
   mobile/                 Expo Router mobile app
   web/                    Next.js web surface + canonical public assets
   api/                    Cloudflare Worker API boundary
-backend/                  Canonical payment orchestration + HTTP routes
-services/                 Persistence, RPC, identity, merchant and notification adapters
+apps/backend/             Canonical payment orchestration + HTTP routes
+components/services/      Persistence, RPC, identity, merchant and notification adapters
 packages/
   payment-core/           Immutable intents, attempts and state transitions
   solana/                 RPC, program registry, Solana Pay, token support

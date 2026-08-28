@@ -37,3 +37,10 @@ The exact attachment binaries were not materialized as ordinary files in this ru
 - One canonical payment engine for Scan, Checkout, Send/API and Solana Actions.
 - Immutable intent lock, separate idempotent attempts, signed-transaction fingerprint binding, recovery without automatic rebroadcast, authoritative cancel/expiry, append-only ledger and immutable receipts.
 - Swap, Bridge, Vault, Sui payments and Escrow remain fail-closed until executable/reconcilable adapters are deployed.
+
+## Repository organization update
+
+- Moved the canonical backend from `backend/` to `apps/backend/`.
+- Moved the shared service adapter package from `services/` to `components/services/`.
+- Updated pnpm workspace discovery, TypeScript path aliases, validation scripts, and architecture references.
+- Package import names remain stable as `@powerpay/backend` and `@powerpay/services`.

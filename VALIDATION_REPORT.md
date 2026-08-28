@@ -76,7 +76,7 @@ Repository snapshot at validation time:
 
 ## Dependency-gated checks
 
-The workspace has no installed `node_modules` in this execution environment. A complete Expo/Next.js/backend/services build therefore remains dependency-gated and is not represented as passed.
+The workspace has no installed `node_modules` in this execution environment. A complete Expo/Next.js/apps/backend/components/services build therefore remains dependency-gated and is not represented as passed.
 
 Before deployment:
 
@@ -92,3 +92,19 @@ pnpm --filter @powerpay/web build
 After exact user-source images are materialized, run `pnpm assets:import-user -- ...` before the final production artifact so source SHA-256 provenance changes from registered/pending to installed/authoritative.
 
 External deployment validation remains required for Prisma/Supabase, Cloudflare, Clerk, Helius/RPC, Pyth, Anchor/Solana programs, Sui Move packages, production mint/config values and native iOS/Android builds.
+
+## Repository relocation validation
+
+Validated after moving the packages:
+
+- `apps/backend/src/index.ts` resolves from `@powerpay/backend`.
+- `components/services/src/index.ts` resolves from `@powerpay/services`.
+- Root `backend/` and `services/` directories no longer exist.
+- `pnpm-workspace.yaml` discovers `apps/*`, `packages/*`, and `components/*`.
+- PowerPay structure check: passed (42 required files).
+- Asset check: passed (77 required assets; registered/pending authoritative binary state).
+- Program registry check: passed (5 manifest entries).
+- Solana Actions manifest/runtime check: passed.
+- Payment invariant check: passed (14 invariants).
+- JSON validation: 68 files parsed successfully.
+- Dependency-backed pnpm typechecks were not rerun because `pnpm` is unavailable in this environment.
