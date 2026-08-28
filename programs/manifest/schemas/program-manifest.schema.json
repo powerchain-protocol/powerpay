@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "programs"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "programs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "version", "network", "programId", "idlHash", "deploymentHash", "status", "features"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+          "network": { "type": "string", "minLength": 1 },
+          "programId": { "type": ["string", "null"] },
+          "idlHash": { "type": ["string", "null"] },
+          "deploymentHash": { "type": ["string", "null"] },
+          "status": { "enum": ["ACTIVE", "DISABLED", "RETIRED", "PENDING"] },
+          "features": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        }
+      }
+    }
+  }
+}

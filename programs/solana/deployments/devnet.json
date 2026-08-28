@@ -1,0 +1,8 @@
+{
+  "network": "devnet",
+  "programs": {
+    "checkout": { "programId": null, "version": "1.0.0" },
+    "settlement": { "programId": null, "version": "1.0.0" }
+  },
+  "note": "Populate via deployment/key sync. No program IDs are fabricated in source control."
+}

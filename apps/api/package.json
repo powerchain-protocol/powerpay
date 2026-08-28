@@ -1,0 +1,21 @@
+{
+  "name": "@powerpay/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@powerpay/backend": "workspace:*",
+    "@powerpay/chain-adapters": "workspace:*",
+    "@powerpay/services": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "typescript": "latest",
+    "wrangler": "latest"
+  }
+}

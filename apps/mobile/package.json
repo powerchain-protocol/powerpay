@@ -1,0 +1,52 @@
+{
+  "name": "@powerpay/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "latest",
+    "@powerpay/core": "workspace:*",
+    "@powerpay/solana": "workspace:*",
+    "@powerpay/web3-icons": "workspace:*",
+    "@react-native-async-storage/async-storage": "latest",
+    "expo": "^57.0.0",
+    "expo-camera": "latest",
+    "expo-crypto": "latest",
+    "expo-haptics": "latest",
+    "expo-linking": "latest",
+    "expo-local-authentication": "latest",
+    "expo-router": "^57.0.17",
+    "expo-secure-store": "latest",
+    "expo-status-bar": "latest",
+    "react": "19.2.3",
+    "react-native": "^0.86.0",
+    "react-native-safe-area-context": "latest",
+    "react-native-svg": "latest",
+    "zod": "latest",
+    "@clerk/expo": "^4.6.0",
+    "@powerpay/payment-core": "workspace:*",
+    "@powerpay/transaction-recovery": "workspace:*",
+    "@solana/web3.js": "latest",
+    "@solana-mobile/mobile-wallet-adapter-protocol": "latest",
+    "@solana-mobile/mobile-wallet-adapter-protocol-web3js": "latest",
+    "buffer": "latest",
+    "react-native-get-random-values": "latest",
+    "@react-native-community/netinfo": "latest",
+    "@powerpay/fees": "workspace:*",
+    "expo-clipboard": "latest",
+    "expo-sharing": "latest",
+    "expo-file-system": "latest",
+    "@powerpay/explorers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "typescript": "latest"
+  }
+}

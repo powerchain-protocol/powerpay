@@ -1,0 +1,10 @@
+{
+  "name": "@powerpay/web3-icons",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "dependencies": { "@web3icons/react": "latest" },
+  "devDependencies": { "typescript": "latest" }
+}

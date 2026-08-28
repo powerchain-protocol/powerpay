@@ -1,0 +1,26 @@
+{
+  "name": "@powerpay/services",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@powerpay/payment-core": "workspace:*",
+    "@powerpay/chain-adapters": "workspace:*",
+    "@powerpay/fees": "workspace:*",
+    "@powerpay/ledger": "workspace:*",
+    "@powerpay/security": "workspace:*",
+    "@solana/web3.js": "latest",
+    "@solana/spl-token": "latest",
+    "@powerpay/oracle": "workspace:*",
+    "buffer": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "network": "mainnet-beta",
+  "programs": {
+    "checkout": { "programId": null, "version": "1.0.0" },
+    "settlement": { "programId": null, "version": "1.0.0" }
+  },
+  "note": "Production IDs must come from deployment keypairs and release governance."
+}

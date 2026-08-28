@@ -1,0 +1,16 @@
+name = "powerpay-api"
+main = "src/index.ts"
+compatibility_date = "2026-08-28"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[vars]
+POWERPAY_ENV = "development"
+SOLANA_CLUSTER = "devnet"
+FEATURE_ESCROW = "false"
+FEATURE_SUI_PAYMENTS = "false"
+FEATURE_BRIDGE = "false"
+FEATURE_VAULT = "true"
+FEATURE_SWAPS = "true"
+FEATURE_SOLANA_ACTIONS = "true"
+FEATURE_TOKEN_2022 = "true"

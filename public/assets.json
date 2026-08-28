@@ -1,0 +1,189 @@
+{
+  "version": "1.0.0",
+  "assets": [
+    {
+      "path": "README.md",
+      "bytes": 727
+    },
+    {
+      "path": "icons/ai-agent.png",
+      "bytes": 6852
+    },
+    {
+      "path": "icons/approval.png",
+      "bytes": 7505
+    },
+    {
+      "path": "icons/battery.png",
+      "bytes": 6028
+    },
+    {
+      "path": "icons/carbon-credit.png",
+      "bytes": 7008
+    },
+    {
+      "path": "icons/dashboard.png",
+      "bytes": 7593
+    },
+    {
+      "path": "icons/depin-node.png",
+      "bytes": 7518
+    },
+    {
+      "path": "icons/energy.png",
+      "bytes": 6508
+    },
+    {
+      "path": "icons/gateway.png",
+      "bytes": 6923
+    },
+    {
+      "path": "icons/grid.png",
+      "bytes": 6228
+    },
+    {
+      "path": "icons/iot-sensor.png",
+      "bytes": 7164
+    },
+    {
+      "path": "icons/marketplace.png",
+      "bytes": 7347
+    },
+    {
+      "path": "icons/payment.png",
+      "bytes": 6976
+    },
+    {
+      "path": "icons/policy.png",
+      "bytes": 7391
+    },
+    {
+      "path": "icons/powerchain-icon-strip.png",
+      "bytes": 137502
+    },
+    {
+      "path": "icons/report.png",
+      "bytes": 7624
+    },
+    {
+      "path": "icons/security.png",
+      "bytes": 7416
+    },
+    {
+      "path": "icons/settings.png",
+      "bytes": 7810
+    },
+    {
+      "path": "icons/solana.png",
+      "bytes": 6689
+    },
+    {
+      "path": "icons/solar.png",
+      "bytes": 6482
+    },
+    {
+      "path": "icons/store.png",
+      "bytes": 7456
+    },
+    {
+      "path": "icons/sui.png",
+      "bytes": 7012
+    },
+    {
+      "path": "icons/token.png",
+      "bytes": 7605
+    },
+    {
+      "path": "icons/user.png",
+      "bytes": 6419
+    },
+    {
+      "path": "icons/wallet.png",
+      "bytes": 7157
+    },
+    {
+      "path": "icons/wind.png",
+      "bytes": 6277
+    },
+    {
+      "path": "illustrations/agent-commerce.png",
+      "bytes": 74086
+    },
+    {
+      "path": "illustrations/depin-network.png",
+      "bytes": 74465
+    },
+    {
+      "path": "illustrations/digital-energy-marketplace.png",
+      "bytes": 99676
+    },
+    {
+      "path": "illustrations/renewable-energy-ecosystem.png",
+      "bytes": 96459
+    },
+    {
+      "path": "illustrations/smart-grid-iot.png",
+      "bytes": 100362
+    },
+    {
+      "path": "images/agent-dashboard-dark.png",
+      "bytes": 91043
+    },
+    {
+      "path": "images/architecture/acp-operational-flow.png",
+      "bytes": 93452
+    },
+    {
+      "path": "images/architecture/agent-commerce-protocol-stack.png",
+      "bytes": 95140
+    },
+    {
+      "path": "images/architecture/depin-iot-renewables.png",
+      "bytes": 85512
+    },
+    {
+      "path": "images/architecture/energy-to-value-workflow.png",
+      "bytes": 69809
+    },
+    {
+      "path": "images/architecture/platform-system-map.png",
+      "bytes": 1622617
+    },
+    {
+      "path": "images/architecture/powerchain-acp-architecture.png",
+      "bytes": 91405
+    },
+    {
+      "path": "images/energy-dashboard-dark.png",
+      "bytes": 96404
+    },
+    {
+      "path": "images/mobile-operations-dark.png",
+      "bytes": 71710
+    },
+    {
+      "path": "images/powerchain-acp-operations-dashboard.png",
+      "bytes": 1572022
+    },
+    {
+      "path": "images/powerchain-mobile-product-showcase.png",
+      "bytes": 1741973
+    },
+    {
+      "path": "images/reference-acp-dashboard.jpg",
+      "bytes": 324932
+    },
+    {
+      "path": "images/reference-copilot-onboarding.jpg",
+      "bytes": 305066
+    },
+    {
+      "path": "images/reference-storefront-checkout.jpg",
+      "bytes": 360766
+    },
+    {
+      "path": "images/storefront-and-checkout.png",
+      "bytes": 135029
+    }
+  ]
+}

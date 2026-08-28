@@ -1,0 +1,90 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@powerpay/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@powerpay/payment-core": [
+        "packages/payment-core/src/index.ts"
+      ],
+      "@powerpay/chain-adapters": [
+        "packages/chain-adapters/src/index.ts"
+      ],
+      "@powerpay/qr": [
+        "packages/qr/src/index.ts"
+      ],
+      "@powerpay/fees": [
+        "packages/fees/src/index.ts"
+      ],
+      "@powerpay/ledger": [
+        "packages/ledger/src/index.ts"
+      ],
+      "@powerpay/security": [
+        "packages/security/src/index.ts"
+      ],
+      "@powerpay/transaction-recovery": [
+        "packages/transaction-recovery/src/index.ts"
+      ],
+      "@powerpay/explorers": [
+        "packages/explorers/src/index.ts"
+      ],
+      "@powerpay/program-clients": [
+        "packages/program-clients/src/index.ts"
+      ],
+      "@powerpay/services": [
+        "services/src/index.ts"
+      ],
+      "@powerpay/backend": [
+        "backend/src/index.ts"
+      ],
+      "@powerpay/payment-machine": [
+        "packages/payment-machine/src/index.ts"
+      ],
+      "@powerpay/capabilities": [
+        "packages/capabilities/src/index.ts"
+      ],
+      "@powerpay/oracle": [
+        "packages/oracle/src/index.ts"
+      ],
+      "@powerpay/database": [
+        "packages/database/src/index.ts"
+      ],
+      "@powerpay/auth": [
+        "packages/auth/src/index.ts"
+      ],
+      "@powerpay/metadata": [
+        "packages/metadata/src/index.ts"
+      ],
+      "@powerpay/web3-icons": [
+        "packages/web3-icons/src/index.ts"
+      ],
+      "@powerpay/swaps": [
+        "packages/swaps/src/index.ts"
+      ],
+      "@powerpay/helius": [
+        "packages/helius/src/index.ts"
+      ],
+      "@powerpay/wallets": [
+        "packages/wallets/src/index.ts"
+      ],
+      "@powerpay/cross-chain": [
+        "packages/cross-chain/src/index.ts"
+      ],
+      "@powerpay/solana": [
+        "packages/solana/src/index.ts"
+      ]
+    }
+  }
+}

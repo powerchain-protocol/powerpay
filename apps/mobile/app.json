@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "PowerPay",
+    "slug": "powerpay",
+    "scheme": "powerpay",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "@clerk/expo",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow PowerPay to use your camera to scan payment QR codes."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID to approve PowerPay payments and security changes."
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.powerchain.powerpay"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F9F7",
+        "foregroundImage": "./assets/icons/adaptive-icon.png"
+      },
+      "package": "com.powerchain.powerpay"
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "icon": "./assets/icons/app-icon.png",
+    "splash": {
+      "image": "./assets/icons/app-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F7F9F7"
+    }
+  }
+}

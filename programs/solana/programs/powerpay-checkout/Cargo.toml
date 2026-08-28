@@ -1,0 +1,16 @@
+[package]
+name = "powerpay-checkout"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "powerpay_checkout"
+
+[features]
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.32"

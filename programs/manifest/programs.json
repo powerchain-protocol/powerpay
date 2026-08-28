@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-28T00:00:00.000Z",
+  "programs": [
+    {
+      "name": "powerpay-checkout",
+      "version": "1.0.0",
+      "network": "devnet",
+      "programId": null,
+      "idlHash": null,
+      "deploymentHash": null,
+      "status": "PENDING",
+      "features": ["checkout", "merchant-reference", "expiry"]
+    },
+    {
+      "name": "powerpay-checkout",
+      "version": "1.0.0",
+      "network": "mainnet-beta",
+      "programId": null,
+      "idlHash": null,
+      "deploymentHash": null,
+      "status": "PENDING",
+      "features": ["checkout", "merchant-reference", "expiry"]
+    },
+    {
+      "name": "powerpay-settlement",
+      "version": "1.0.0",
+      "network": "devnet",
+      "programId": null,
+      "idlHash": null,
+      "deploymentHash": null,
+      "status": "PENDING",
+      "features": ["settlement", "receipt", "fee-routing"]
+    },
+    {
+      "name": "powerpay-settlement",
+      "version": "1.0.0",
+      "network": "mainnet-beta",
+      "programId": null,
+      "idlHash": null,
+      "deploymentHash": null,
+      "status": "PENDING",
+      "features": ["settlement", "receipt", "fee-routing"]
+    },
+    {
+      "name": "powerpay-sui-payments",
+      "version": "1.0.0",
+      "network": "devnet",
+      "programId": null,
+      "idlHash": null,
+      "deploymentHash": null,
+      "status": "PENDING",
+      "features": ["payments", "receipt"]
+    }
+  ]
+}

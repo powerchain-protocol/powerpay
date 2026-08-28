@@ -1,0 +1,25 @@
+{
+  "name": "@powerpay/backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@powerpay/payment-core": "workspace:*",
+    "@powerpay/chain-adapters": "workspace:*",
+    "@powerpay/fees": "workspace:*",
+    "@powerpay/ledger": "workspace:*",
+    "@powerpay/qr": "workspace:*",
+    "@powerpay/security": "workspace:*",
+    "@powerpay/services": "workspace:*",
+    "@powerpay/capabilities": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

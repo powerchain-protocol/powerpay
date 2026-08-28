@@ -1,0 +1,10 @@
+{
+  "name": "@powerpay/payment-machine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "dependencies": { "@powerpay/payment-core": "workspace:*" },
+  "devDependencies": { "typescript": "latest" }
+}

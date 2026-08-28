@@ -1,0 +1,24 @@
+{
+  "name": "powerpay-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PowerPay mobile-first payments platform for Solana, Sui, USDC, EURC and PWRC.",
+  "packageManager": "pnpm@11.24.0",
+  "scripts": {
+    "dev": "pnpm --filter @powerpay/mobile start",
+    "mobile": "pnpm --filter @powerpay/mobile start",
+    "api": "pnpm --filter @powerpay/api dev",
+    "typecheck": "pnpm -r typecheck",
+    "check": "node scripts/check-structure.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && pnpm -r typecheck",
+    "programs:check": "node scripts/check-program-registry.mjs",
+    "backend": "pnpm --filter @powerpay/backend typecheck",
+    "services": "pnpm --filter @powerpay/services typecheck",
+    "check:structure": "node scripts/check-structure.mjs",
+    "check:programs": "node scripts/check-program-registry.mjs",
+    "check:actions": "node scripts/check-actions-manifest.mjs",
+    "check:payments": "node scripts/check-payment-invariants.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
