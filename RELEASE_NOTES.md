@@ -1,40 +1,39 @@
-# PowerPay v1.0.0 — hardened upgrade
+# PowerPay v1.0.0 — canonical asset-system upgrade
 
-## Payment execution
+## Visual identity
+
+- Browser-facing assets standardized under `apps/web/public`.
+- Native Expo assets standardized under `apps/mobile/assets`.
+- `packages/shared/src/assets.ts` is the canonical visual registry used by both surfaces.
+- PWRC and wPWRC are distinct PowerPay-owned assets; wPWRC is associated with Sui only at the visual/network-label layer.
+- Added green, white and dark PowerPay/PowerChain mark variants and centralized their references.
+- Added premium/mark scale behavior so detailed coin art is not shrunk into dense 16–24px UI.
+- Added `/asset-preview` coverage for owned tokens, brand tones, networks and wallets.
+
+## Latest user-supplied sources
+
+The latest `pwrc.jpeg`, `wpwrc.jpeg`, `logo-green.png`, `logo-white.png`, and `logo-dark.png` attachment IDs are registered as authoritative sources in `assets/source/user-brand/manifest.json`.
+
+The exact attachment binaries were not materialized as ordinary files in this runtime. The release therefore keeps explicit `uploaded-derived-fallback` served bytes and includes `scripts/import-user-brand-assets.mjs` to install the exact originals later. The importer records SHA-256 provenance and changes the public manifest to `user-upload-authoritative` only after successful installation.
+
+## Web3 Icons
+
+- Pinned `@web3icons/react` at `4.1.21` for web UI components.
+- Pinned `@web3icons/core` at `4.0.55` for selected static SVG source files and Expo raster derivatives.
+- Added USDC, EURC, SOL, SUI, Solana, Sui, Phantom, Solflare, Backpack and WalletConnect visuals.
+- Web uses individual/tree-shakable icon imports rather than dynamic Web3Icons imports.
+- Attribution is retained in `apps/web/public/assets/WEB3ICONS.md`.
+
+## Wallet modal
+
+- Phantom, Solflare and Backpack compatibility rows now use actual wallet identities rather than generic dots.
+- Added WalletConnect identity with an explicit gated state.
+- `EXPO_PUBLIC_REOWN_PROJECT_ID` is registered as optional configuration, but no WalletConnect/Reown path is presented as executable until the connector adapter is deployed.
+- Sui remains connector/capability gated.
+- Account authentication, wallet connection, and transaction authorization remain separate.
+
+## Existing production hardening retained
 
 - One canonical payment engine for Scan, Checkout, Send/API and Solana Actions.
-- Immutable intent lock and signed fee quote.
-- Separate execution attempts with attempt-level idempotency keys.
-- SHA-256 signed-transaction binding prevents a retry from substituting a different payload.
-- Server-authoritative expiry and cancellation.
-- Automatic expiry is limited to `CREATED`/`LOCKED`; signed/uncertain states require recovery/reconciliation.
-- Append-only payment timeline and immutable settlement receipts.
-
-## Mobile recovery
-
-- Signed recovery payloads moved from AsyncStorage to Expo SecureStore.
-- AsyncStorage stores only non-secret recovery metadata.
-- Reconnect/relaunch reconciliation does not automatically rebroadcast transactions.
-- Checkout cancel calls the backend and refuses unsafe cancellation after signing/submission uncertainty.
-
-## Runtime capabilities
-
-- Added requested-vs-effective capability policy.
-- Swap, Bridge, Vault, Sui payments and Escrow fail closed until an actual execution/reconciliation adapter is present.
-- Removed fabricated swap output, bridge destination and vault balance values.
-- Added `GET /api/v1/readiness` for non-secret deployment readiness.
-
-## Infrastructure
-
-- `/backend` remains the canonical orchestration boundary.
-- `/services` provides account, wallet, persistence, merchant, notification, portfolio and Solana execution adapters.
-- Supabase/Postgres stores intent/attempt/quote/ledger/receipt records and strips raw signed transaction payloads.
-- Program manifest validation now checks deployment-registry parity and ACTIVE deployment hashes.
-- Solana Actions root manifest is checked against runtime routes.
-
-## Mobile/product
-
-- USDC-first mobile experience with EURC, SOL and PWRC.
-- Camera-first QR scan flow.
-- Uploaded PowerChain visual assets retained in onboarding/public asset directories.
-- Live wallet portfolio and notification/account surfaces remain backend-driven.
+- Immutable intent lock, separate idempotent attempts, signed-transaction fingerprint binding, recovery without automatic rebroadcast, authoritative cancel/expiry, append-only ledger and immutable receipts.
+- Swap, Bridge, Vault, Sui payments and Escrow remain fail-closed until executable/reconcilable adapters are deployed.

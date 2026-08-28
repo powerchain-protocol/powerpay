@@ -131,7 +131,7 @@ export default {
       nonceStore: repository,
       features: effectiveFeatures,
       publicBaseUrl,
-      iconUrl: `${publicBaseUrl.replace(/\/$/, '')}/icons/payment.png`,
+      iconUrl: `${publicBaseUrl.replace(/\/$/, '')}/assets/brand/powerpay-mark-green.png`,
       allowedActionHosts: [new URL(publicBaseUrl).host],
       getPrices: (base, quote) => oracle.getPrices(base, quote),
       heliusWebhookSecret: env.HELIUS_WEBHOOK_SECRET,

@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
-  "dependencies": { "@web3icons/react": "latest" },
-  "devDependencies": { "typescript": "latest" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@web3icons/core": "4.0.55",
+    "@web3icons/react": "4.1.21"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
 }

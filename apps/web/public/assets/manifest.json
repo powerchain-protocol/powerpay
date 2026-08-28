@@ -1,0 +1,61 @@
+{
+  "version": "1.2.0",
+  "authoritativeAttachmentsRegistered": true,
+  "authoritativeSourceManifest": "assets/source/user-brand/manifest.json",
+  "installationState": "registered-awaiting-binary-materialization",
+  "owned": {
+    "brandMark": {
+      "path": "/assets/brand/powerpay-mark-green.png",
+      "variants": {
+        "green": "/assets/brand/powerpay-mark-green.png",
+        "white": "/assets/brand/powerpay-mark-white.png",
+        "dark": "/assets/brand/powerpay-mark-dark.png"
+      },
+      "provenance": "uploaded-derived-fallback",
+      "authoritativeAttachment": "file_00000000042481f4bda4f6b8e5017789",
+      "note": "The exact logo-green/logo-white/logo-dark uploads are registered as authoritative. Current served bytes remain a build-safe fallback until scripts/import-user-brand-assets.mjs is run with materialized originals."
+    },
+    "pwrcMark": {
+      "path": "/assets/tokens/pwrc-mark.png",
+      "vector": "/assets/tokens/pwrc-mark.svg",
+      "provenance": "uploaded-derived-fallback",
+      "source": [
+        "assets/source/powerchain/icons/energy.png",
+        "assets/source/powerchain/icons/token.png"
+      ]
+    },
+    "pwrcCoin": {
+      "path": "/assets/tokens/pwrc-coin.png",
+      "retina": "/assets/tokens/pwrc-coin@2x.png",
+      "provenance": "uploaded-derived-fallback",
+      "authoritativeAttachment": "file_00000000efe881f4b7b58f11d1aba558",
+      "note": "pwrc.jpeg is the authoritative premium PWRC coin source; import is pending exact binary materialization."
+    },
+    "wpwrcCoin": {
+      "path": "/assets/tokens/wpwrc-coin.png",
+      "retina": "/assets/tokens/wpwrc-coin@2x.png",
+      "provenance": "uploaded-derived-fallback",
+      "authoritativeAttachment": "file_00000000832481f48bd3f73bb2dacf54",
+      "note": "wpwrc.jpeg is the authoritative wPWRC coin source; wPWRC remains a distinct Sui visual identity."
+    }
+  },
+  "external": {
+    "provider": "@web3icons/react",
+    "version": "4.1.21",
+    "staticSourceProvider": "@web3icons/core",
+    "staticSourceVersion": "4.0.55",
+    "license": "MIT",
+    "assets": [
+      "SOL",
+      "USDC",
+      "EURC",
+      "SUI",
+      "Solana",
+      "Sui",
+      "Phantom",
+      "Solflare",
+      "Backpack",
+      "WalletConnect"
+    ]
+  }
+}

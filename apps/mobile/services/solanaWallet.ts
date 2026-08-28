@@ -2,12 +2,13 @@ import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Buffer } from 'buffer';
 import { Transaction } from '@solana/web3.js';
+import { POWERPAY_PUBLIC_ASSETS } from '@powerpay/shared/assets';
 
 const AUTH_TOKEN_KEY = 'powerpay.solana.mwa.auth-token';
 const APP_IDENTITY = {
   name: 'PowerPay',
   uri: process.env.EXPO_PUBLIC_POWERPAY_WEB_URL || 'https://powerchain.ventures',
-  icon: '/icons/payment.png',
+  icon: POWERPAY_PUBLIC_ASSETS.brand.markGreen,
 };
 
 function chain() {

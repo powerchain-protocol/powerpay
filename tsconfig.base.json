@@ -84,6 +84,15 @@
       ],
       "@powerpay/solana": [
         "packages/solana/src/index.ts"
+      ],
+      "@powerpay/shared": [
+        "packages/shared/src/index.ts"
+      ],
+      "@powerpay/shared/*": [
+        "packages/shared/src/*"
+      ],
+      "@powerpay/ui": [
+        "packages/ui/src/index.ts"
       ]
     }
   }

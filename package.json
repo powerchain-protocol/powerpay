@@ -9,16 +9,24 @@
     "mobile": "pnpm --filter @powerpay/mobile start",
     "api": "pnpm --filter @powerpay/api dev",
     "typecheck": "pnpm -r typecheck",
-    "check": "node scripts/check-structure.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && pnpm -r typecheck",
+    "check": "node scripts/check-structure.mjs && node scripts/check-assets.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && pnpm -r typecheck",
     "programs:check": "node scripts/check-program-registry.mjs",
     "backend": "pnpm --filter @powerpay/backend typecheck",
     "services": "pnpm --filter @powerpay/services typecheck",
     "check:structure": "node scripts/check-structure.mjs",
     "check:programs": "node scripts/check-program-registry.mjs",
     "check:actions": "node scripts/check-actions-manifest.mjs",
-    "check:payments": "node scripts/check-payment-invariants.mjs"
+    "check:payments": "node scripts/check-payment-invariants.mjs",
+    "check:assets": "node scripts/check-assets.mjs",
+    "assets:import-user": "node scripts/import-user-brand-assets.mjs",
+    "assets:sync-web3icons": "node scripts/sync-web3icons.mjs",
+    "assets:check": "node scripts/check-assets.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "@web3icons/core": "4.0.55",
+    "sharp": "0.35.4"
   }
 }

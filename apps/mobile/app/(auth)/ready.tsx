@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { MOBILE_ASSETS } from '@/assets';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { PrimaryButton } from '@/components/PrimaryButton';
@@ -10,7 +11,7 @@ import { completeOnboarding } from '@/services/onboarding';
 export default function ReadyScreen() {
   return <Screen>
     <View style={styles.logo}><PowerPayLogo size={28} /></View>
-    <View style={styles.visual}><Image source={require('../../assets/visuals/mobile-showcase.png')} style={styles.image} resizeMode="cover" /></View>
+    <View style={styles.visual}><Image source={MOBILE_ASSETS.illustrations.mobileShowcase} style={styles.image} resizeMode="cover" /></View>
     <View style={styles.check}><Ionicons name="checkmark" size={28} color={colors.white} /></View>
     <Text style={styles.title}>PowerPay is ready.</Text>
     <Text style={styles.subtitle}>USDC is your default payment asset. Open Scan for local-shop QR payments or Pay to send directly.</Text>

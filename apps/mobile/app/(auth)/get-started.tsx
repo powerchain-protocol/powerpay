@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { MOBILE_ASSETS } from '@/assets';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { PageHeader } from '@/components/PageHeader';
@@ -16,7 +17,7 @@ export default function GetStartedScreen() {
   return (
     <Screen>
       <PageHeader title="Get started" />
-      <View style={styles.visual}><Image source={require('../../assets/visuals/onboarding-checkout.png')} style={styles.image} resizeMode="cover" /></View>
+      <View style={styles.visual}><Image source={MOBILE_ASSETS.illustrations.checkout} style={styles.image} resizeMode="cover" /></View>
       <Text style={styles.title}>One wallet. Every way to pay.</Text>
       <Text style={styles.subtitle}>PowerPay keeps payment intent, signing, settlement and receipts deterministic while routing the protocol infrastructure underneath.</Text>
       <View style={styles.list}>{items.map(([icon, title, text]) => <View key={title} style={styles.item}><View style={styles.icon}><Ionicons name={icon} size={22} color={colors.primary} /></View><View style={{ flex: 1 }}><Text style={styles.itemTitle}>{title}</Text><Text style={styles.itemText}>{text}</Text></View></View>)}</View>

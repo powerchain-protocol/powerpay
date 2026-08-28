@@ -1,0 +1,14 @@
+{
+  "name": "@powerpay/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "dev": "next dev", "build": "next build" },
+  "dependencies": {
+    "@powerpay/shared": "workspace:*",
+    "@powerpay/ui": "workspace:*",
+    "@web3icons/react": "4.1.21",
+    "next": "^16.3.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  }
+}

@@ -41,8 +41,10 @@ const required = [
   'programs/solana/programs/powerpay-checkout/src/lib.rs',
   'programs/solana/programs/powerpay-settlement/src/lib.rs',
   'programs/sui/sources/payments.move',
-  'public/images/illustrations/agent-commerce.png',
-  'public/icons/payment.png',
+  'apps/web/public/assets/brand/powerpay-mark-green.png',
+  'apps/web/public/assets/tokens/pwrc-coin.png',
+  'packages/shared/src/assets.ts',
+  'packages/ui/src/components/AssetIcon.tsx',
 ];
 
 const missing = required.filter((file) => !existsSync(resolve(root, file)));

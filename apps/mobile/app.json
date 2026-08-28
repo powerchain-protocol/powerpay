@@ -30,16 +30,16 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#F7F9F7",
-        "foregroundImage": "./assets/icons/adaptive-icon.png"
+        "foregroundImage": "./assets/brand/adaptive-icon.png"
       },
       "package": "com.powerchain.powerpay"
     },
     "experiments": {
       "typedRoutes": true
     },
-    "icon": "./assets/icons/app-icon.png",
+    "icon": "./assets/brand/app-icon.png",
     "splash": {
-      "image": "./assets/icons/app-icon.png",
+      "image": "./assets/brand/app-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F7F9F7"
     }

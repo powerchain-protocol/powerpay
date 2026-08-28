@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { PowerPayLogo } from './PowerPayLogo';
+import { BrandMark } from './BrandMark';
 import { colors } from '@/styles/theme';
 import { usePowerPayAuth } from '@/providers/AuthProvider';
 import { usePowerPayNotifications } from '@/hooks/useNotifications';
@@ -12,7 +13,7 @@ export function AppHeader({ unread: unreadOverride }: { unread?: number }) {
   const unread = unreadOverride ?? notifications.unread;
   return (
     <View style={styles.header}>
-      <PowerPayLogo size={26} />
+      <View style={styles.brand}><BrandMark size={24} /><PowerPayLogo size={26} /></View>
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
@@ -36,6 +37,7 @@ export function AppHeader({ unread: unreadOverride }: { unread?: number }) {
 
 const styles = StyleSheet.create({
   header: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   iconButton: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   avatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#E7F2EB', alignItems: 'center', justifyContent: 'center' },

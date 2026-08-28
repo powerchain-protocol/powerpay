@@ -38,7 +38,7 @@ export default function WalletScreen() {
         <LiveAsset symbol="USDC" amount={portfolio.byAsset.USDC?.amount} subtitle="Solana · Default payment asset" fiat={portfolio.byAsset.USDC ? `$${formatAssetAmount(portfolio.byAsset.USDC.amount, 2)}` : 'Mint not configured'} />
         <View style={styles.divider} /><LiveAsset symbol="EURC" amount={portfolio.byAsset.EURC?.amount} subtitle="Euro stablecoin" fiat={portfolio.byAsset.EURC ? `€${formatAssetAmount(portfolio.byAsset.EURC.amount, 2)}` : 'Mint not configured'} />
         <View style={styles.divider} /><LiveAsset symbol="SOL" amount={portfolio.byAsset.SOL?.amount} subtitle={portfolio.solPrice ? `${portfolio.solPrice.source.toUpperCase()} · $${formatAssetAmount(portfolio.solPrice.price, 2)} / SOL` : 'Live RPC balance'} fiat={portfolio.byAsset.SOL && solPrice > 0 ? `$${formatAssetAmount(String(Number(portfolio.byAsset.SOL.amount) * solPrice), 2)}` : 'Price unavailable'} />
-        <View style={styles.divider} /><LiveAsset symbol="PWRC" amount={portfolio.byAsset.PWRC?.amount} subtitle="Token-2022" fiat={portfolio.byAsset.PWRC ? 'Utility asset' : 'Mint not configured'} />
+        <View style={styles.divider} /><LiveAsset symbol="PWRC" amount={portfolio.byAsset.PWRC?.amount} subtitle="Token-2022 · PowerPay-owned visual" fiat={portfolio.byAsset.PWRC ? 'Utility asset' : 'Mint not configured'} onPress={() => router.push('/wallet/pwrc')} />
       </View>
       {!wallet.address ? <View style={styles.info}><Text style={styles.infoText}>No balance is fabricated while disconnected. PowerPay reads exact native/SPL/Token-2022 balances through the configured server RPC after wallet connection.</Text></View> : null}
 
@@ -54,7 +54,7 @@ export default function WalletScreen() {
   );
 }
 
-function LiveAsset({ symbol, amount, fiat, subtitle }: { symbol: string; amount?: string; fiat: string; subtitle: string }) { return <AssetRow symbol={symbol} amount={amount === undefined ? '—' : formatAssetAmount(amount)} fiat={fiat} subtitle={subtitle} />; }
+function LiveAsset({ symbol, amount, fiat, subtitle, onPress }: { symbol: string; amount?: string; fiat: string; subtitle: string; onPress?: () => void }) { return <AssetRow symbol={symbol} amount={amount === undefined ? '—' : formatAssetAmount(amount)} fiat={fiat} subtitle={subtitle} onPress={onPress} />; }
 function Feature({ title, subtitle, onPress }: { title: string; subtitle: string; onPress?: () => void }) { return <Pressable onPress={onPress} disabled={!onPress} style={styles.feature}><Text style={styles.featureTitle}>{title}</Text><Text style={styles.featureSub}>{subtitle}</Text></Pressable>; }
 function short(value: string) { return value.length <= 16 ? value : `${value.slice(0, 6)}…${value.slice(-5)}`; }
 

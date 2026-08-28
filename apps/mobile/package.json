@@ -43,7 +43,9 @@
     "expo-clipboard": "latest",
     "expo-sharing": "latest",
     "expo-file-system": "latest",
-    "@powerpay/explorers": "workspace:*"
+    "@powerpay/explorers": "workspace:*",
+    "@powerpay/shared": "workspace:*",
+    "react-native-qrcode-svg": "6.3.21"
   },
   "devDependencies": {
     "@types/react": "latest",
