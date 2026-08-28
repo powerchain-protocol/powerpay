@@ -9,7 +9,7 @@
     "mobile": "pnpm --filter @powerpay/mobile start",
     "api": "pnpm --filter @powerpay/api dev",
     "typecheck": "pnpm -r typecheck",
-    "check": "node scripts/check-structure.mjs && node scripts/check-assets.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && node scripts/check-pnpm-build-policy.mjs && node scripts/check-expo-config.mjs && pnpm -r typecheck",
+    "check": "node scripts/check-structure.mjs && node scripts/check-assets.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && node scripts/check-pnpm-build-policy.mjs && node scripts/check-expo-config.mjs && node scripts/check-web-experience.mjs && pnpm -r typecheck",
     "programs:check": "node scripts/check-program-registry.mjs",
     "backend": "pnpm --filter @powerpay/backend typecheck",
     "services": "pnpm --filter @powerpay/services typecheck",
@@ -23,13 +23,20 @@
     "assets:check": "node scripts/check-assets.mjs",
     "deps:approve-builds": "pnpm approve-builds",
     "check:build-policy": "node scripts/check-pnpm-build-policy.mjs",
-    "web": "pnpm --filter @powerpay/mobile web",
+    "web": "pnpm --filter @powerpay/web dev",
     "web:clear": "pnpm --filter @powerpay/mobile web:clear",
     "ios": "pnpm --filter @powerpay/mobile ios",
     "ios:native": "pnpm --filter @powerpay/mobile ios:native",
     "ios:doctor": "node scripts/check-ios-toolchain.mjs",
     "expo:doctor": "pnpm --filter @powerpay/mobile doctor",
-    "check:expo": "node scripts/check-expo-config.mjs"
+    "check:expo": "node scripts/check-expo-config.mjs",
+    "website": "pnpm --filter @powerpay/web dev",
+    "website:build": "pnpm --filter @powerpay/web build",
+    "website:typecheck": "pnpm --filter @powerpay/web typecheck",
+    "mobile:web": "pnpm --filter @powerpay/mobile web",
+    "mobile:web:clear": "pnpm --filter @powerpay/mobile web:clear",
+    "web:build": "pnpm --filter @powerpay/web build",
+    "check:web": "node scripts/check-web-experience.mjs"
   },
   "engines": {
     "node": ">=22"

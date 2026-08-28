@@ -2,13 +2,26 @@
   "name": "@powerpay/web",
   "version": "1.0.0",
   "private": true,
-  "scripts": { "dev": "next dev", "build": "next build" },
+  "description": "PowerPay public payments website and non-custodial checkout for USDC-first Solana payments.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@powerpay/shared": "workspace:*",
     "@powerpay/ui": "workspace:*",
+    "@solana/web3.js": "^1.98.4",
     "@web3icons/react": "4.1.21",
+    "buffer": "^6.0.3",
     "next": "^16.3.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.9.2"
   }
 }

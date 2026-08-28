@@ -41,6 +41,27 @@ programs/
   sui/                    Move payment/receipt primitive
 ```
 
+## Web + checkout
+
+`apps/web` is now a dedicated PowerPay public website and non-custodial checkout surface. Its visual language is adapted from the historical `powerchain-protocol/powerpay-checkout` light checkout: white bordered panels, compact status context, medium radii, restrained green actions, a three-step payment flow, and a sticky order summary.
+
+Routes:
+
+- `/` — PowerPay marketing/product website
+- `/checkout` — USDC-first web checkout
+- `/asset-preview` — canonical asset registry preview
+- `/api/powerpay/**` — same-origin proxy to the PowerPay API
+
+Run the website separately from Expo Web:
+
+```bash
+pnpm web          # apps/web / Next.js
+pnpm web:build
+pnpm mobile:web   # Expo web/PWA
+```
+
+The web checkout uses the canonical intent/attempt engine and stays in preview mode until `NEXT_PUBLIC_POWERPAY_DEMO_RECIPIENT` is configured. See `docs/WEB_CHECKOUT.md`.
+
 ## Mobile UX
 
 ### Scan-to-pay
