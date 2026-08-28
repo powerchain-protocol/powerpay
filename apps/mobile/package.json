@@ -5,10 +5,15 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "ios": "expo run:ios",
-    "android": "expo run:android",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start:clear": "expo start --clear",
+    "ios:native": "expo run:ios",
+    "android:native": "expo run:android",
+    "web:clear": "expo start --web --clear",
+    "doctor": "expo-doctor"
   },
   "dependencies": {
     "@expo/vector-icons": "latest",
@@ -45,7 +50,12 @@
     "expo-file-system": "latest",
     "@powerpay/explorers": "workspace:*",
     "@powerpay/shared": "workspace:*",
-    "react-native-qrcode-svg": "6.3.21"
+    "react-native-qrcode-svg": "6.3.21",
+    "react-dom": "19.2.3",
+    "react-native-web": "^0.21.2",
+    "@expo/metro-runtime": "^57.0.14",
+    "expo-constants": "~57.0.8",
+    "react-native-screens": "4.26.0"
   },
   "devDependencies": {
     "@types/react": "latest",

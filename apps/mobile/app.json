@@ -42,6 +42,14 @@
       "image": "./assets/brand/app-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F7F9F7"
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "web": {
+      "bundler": "metro"
     }
   }
 }

@@ -9,7 +9,7 @@
     "mobile": "pnpm --filter @powerpay/mobile start",
     "api": "pnpm --filter @powerpay/api dev",
     "typecheck": "pnpm -r typecheck",
-    "check": "node scripts/check-structure.mjs && node scripts/check-assets.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && pnpm -r typecheck",
+    "check": "node scripts/check-structure.mjs && node scripts/check-assets.mjs && node scripts/check-program-registry.mjs && node scripts/check-actions-manifest.mjs && node scripts/check-payment-invariants.mjs && node scripts/check-pnpm-build-policy.mjs && node scripts/check-expo-config.mjs && pnpm -r typecheck",
     "programs:check": "node scripts/check-program-registry.mjs",
     "backend": "pnpm --filter @powerpay/backend typecheck",
     "services": "pnpm --filter @powerpay/services typecheck",
@@ -20,7 +20,16 @@
     "check:assets": "node scripts/check-assets.mjs",
     "assets:import-user": "node scripts/import-user-brand-assets.mjs",
     "assets:sync-web3icons": "node scripts/sync-web3icons.mjs",
-    "assets:check": "node scripts/check-assets.mjs"
+    "assets:check": "node scripts/check-assets.mjs",
+    "deps:approve-builds": "pnpm approve-builds",
+    "check:build-policy": "node scripts/check-pnpm-build-policy.mjs",
+    "web": "pnpm --filter @powerpay/mobile web",
+    "web:clear": "pnpm --filter @powerpay/mobile web:clear",
+    "ios": "pnpm --filter @powerpay/mobile ios",
+    "ios:native": "pnpm --filter @powerpay/mobile ios:native",
+    "ios:doctor": "node scripts/check-ios-toolchain.mjs",
+    "expo:doctor": "pnpm --filter @powerpay/mobile doctor",
+    "check:expo": "node scripts/check-expo-config.mjs"
   },
   "engines": {
     "node": ">=22"

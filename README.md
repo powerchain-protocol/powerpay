@@ -163,3 +163,21 @@ pnpm typecheck
 ```
 
 Solana program compilation additionally requires Rust + Solana + Anchor. Sui program compilation requires the Sui CLI.
+
+## pnpm dependency build policy
+
+PowerPay uses pnpm 11's fail-closed `allowBuilds` policy. The approved lifecycle/build scripts are pinned to the exact dependency versions currently required by the workspace. New or upgraded packages with build scripts must be reviewed explicitly.
+
+```bash
+pnpm install
+pnpm run check:build-policy
+pnpm run deps:approve-builds   # interactive review for future unapproved packages
+```
+
+Do not enable `dangerouslyAllowAllBuilds`.
+
+## Local Expo development
+
+PowerPay supports iOS, Android, and Expo Web. After dependency changes run `pnpm install`, then use `pnpm web:clear` for web or `pnpm ios` for the iOS Expo launcher. Native local compilation is available separately as `pnpm ios:native`.
+
+If Xcode/Simulator discovery fails, run `pnpm ios:doctor`. See [`docs/mobile/local-development.md`](docs/mobile/local-development.md) for the full repair checklist.
