@@ -1,0 +1,13 @@
+{"timestamp":"00:00:11.118","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:11.121","source":"Server","level":"LOG","message":"  We detected TypeScript in your project and reconfigured your tsconfig.json file for you."}
+{"timestamp":"00:00:11.121","source":"Server","level":"LOG","message":"  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:\n"}
+{"timestamp":"00:00:11.125","source":"Server","level":"LOG","message":"  \t- include was updated to add '.next/dev/types/**/*.ts'"}
+{"timestamp":"00:00:11.127","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:11.130","source":"Server","level":"LOG","message":"  The following mandatory changes were made to your tsconfig.json:\n"}
+{"timestamp":"00:00:11.283","source":"Server","level":"LOG","message":"  \t- jsx was set to react-jsx (next.js uses the React automatic runtime)"}
+{"timestamp":"00:00:11.293","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:12.970","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:01:31.158","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:02:43.424","source":"Server","level":"LOG","message":"○ Compiling /checkout ..."}
+{"timestamp":"00:02:52.821","source":"Browser","level":"WARN","message":"Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior=\"smooth\"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior"}
+{"timestamp":"00:02:53.153","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mDetected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior=\\\"smooth\\\"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior\\u001b[39m\""}
