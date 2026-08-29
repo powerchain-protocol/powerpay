@@ -1,0 +1,9 @@
+{
+  "network": "mainnet",
+  "packages": {
+    "payments": {
+      "packageId": null,
+      "version": "1.0.0"
+    }
+  }
+}

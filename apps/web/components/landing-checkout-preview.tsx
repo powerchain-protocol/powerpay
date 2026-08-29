@@ -1,11 +1,11 @@
-import { AssetIcon, NetworkIcon } from '@powerpay/ui';
+import { AssetIcon, NetworkIcon, StatusBadge } from '@powerpay/ui';
 
 export function LandingCheckoutPreview() {
   return (
     <div className="hero-product" aria-label="PowerPay checkout preview">
       <div className="preview-topbar">
         <span><span className="preview-dot" />Checkout preview</span>
-        <span className="preview-network"><NetworkIcon network="solana" size={16} /> Solana</span>
+        <span className="preview-network"><NetworkIcon network="solana" size={16} /> Solana <StatusBadge tone="warning">Devnet</StatusBadge></span>
       </div>
       <div className="preview-body">
         <div className="preview-main">
@@ -27,10 +27,12 @@ export function LandingCheckoutPreview() {
           <span className="verified-line">✓ Verified merchant</span>
           <dl>
             <div><dt>Payment</dt><dd>125.00 USDC</dd></div>
-            <div><dt>Network</dt><dd>Solana</dd></div>
-            <div><dt>Quote</dt><dd>Locked</dd></div>
+            <div><dt>Service fee</dt><dd>2.00%</dd></div>
+            <div><dt>Solana fee</dt><dd>Wallet estimated</dd></div>
+            <div><dt>Network</dt><dd>Solana · Devnet</dd></div>
+            <div><dt>Quote</dt><dd>Locked at review</dd></div>
           </dl>
-          <div className="preview-total"><span>Total</span><strong>125.00 USDC</strong></div>
+          <div className="preview-total"><span>Total</span><strong>Calculated at review</strong></div>
         </aside>
       </div>
     </div>

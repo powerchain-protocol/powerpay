@@ -15,6 +15,17 @@ for (const network of ['devnet', 'mainnet']) {
   }
 }
 
+const suiDeployments = new Map();
+for (const network of ['devnet', 'testnet', 'mainnet']) {
+  const file = resolve(root, `programs/sui/deployments/${network}.json`);
+  const data = JSON.parse(readFileSync(file, 'utf8'));
+  if (data.network !== network) throw new Error(`Sui ${network} deployment file declares ${data.network}`);
+  for (const [name, config] of Object.entries(data.packages)) {
+    if (config.packageId !== null && !/^0x[0-9a-fA-F]{1,64}$/.test(config.packageId)) throw new Error(`Sui ${network}.${name} has an invalid package id`);
+    suiDeployments.set(`${network}:${name}`, config);
+  }
+}
+
 const manifest = JSON.parse(readFileSync(resolve(root, 'programs/manifest/programs.json'), 'utf8'));
 if (manifest.schemaVersion !== 1 || !Array.isArray(manifest.programs)) throw new Error('Unsupported program manifest schema');
 const seen = new Set();
@@ -35,6 +46,12 @@ for (const program of manifest.programs) {
     if (!deployed) throw new Error(`${key} missing Solana deployment registry entry`);
     if (deployed.version !== program.version) throw new Error(`${key} version drift between manifest and deployment registry`);
     if ((deployed.programId ?? null) !== (program.programId ?? null)) throw new Error(`${key} programId drift between manifest and deployment registry`);
+  }
+  if (program.name === 'powerpay-sui-payments') {
+    const deployed = suiDeployments.get(`${program.network}:payments`);
+    if (!deployed) throw new Error(`${key} missing Sui deployment registry entry`);
+    if (deployed.version !== program.version) throw new Error(`${key} version drift between manifest and Sui deployment registry`);
+    if ((deployed.packageId ?? null) !== (program.programId ?? null)) throw new Error(`${key} packageId drift between manifest and Sui deployment registry`);
   }
 }
 console.log(`Program registry/manifest check passed (${manifest.programs.length} manifest entries).`);

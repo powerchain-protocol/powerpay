@@ -1,88 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as Crypto from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { PublicKey } from '@solana/web3.js';
 import { AppHeader } from '@/components/AppHeader';
 import { AssetIcon } from '@/components/AssetIcon';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
-import { colors, radius } from '@/styles/theme';
+import { colors } from '@/styles/theme';
 import { powerPayApi } from '@/services/api';
-
-const assets = ['USDC', 'EURC', 'SOL', 'SUI', 'PWRC'] as const;
-
-export default function PayScreen() {
-  const params = useLocalSearchParams<{ recipient?: string; asset?: string; merchant?: string }>();
-  const [amount, setAmount] = useState('');
-  const [asset, setAsset] = useState<(typeof assets)[number]>((assets.includes(params.asset as any) ? params.asset : 'USDC') as any);
-  const [recipient, setRecipient] = useState(params.recipient || '');
-  const [marketRate, setMarketRate] = useState<string>();
-  const [priceMeta, setPriceMeta] = useState<string>();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  useEffect(() => { if (params.recipient) setRecipient(params.recipient); }, [params.recipient]);
-  useEffect(() => {
-    let alive = true;
-    if (asset !== 'SOL' && asset !== 'SUI') { setMarketRate(undefined); setPriceMeta(undefined); return; }
-    powerPayApi.prices(asset, 'USD').then((body) => {
-      if (!alive) return;
-      const price = body.prices?.transactional || body.prices?.reference;
-      if (price?.price) {
-        setMarketRate(price.price);
-        setPriceMeta(`${price.source === 'pyth' ? 'Pyth transactional quote' : 'CoinGecko reference'} · ${new Date(price.observedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
-      }
-    }).catch(() => { if (alive) { setMarketRate(undefined); setPriceMeta('Live conversion unavailable'); } });
-    return () => { alive = false; };
-  }, [asset]);
-
-  const numeric = Number(amount);
-  const canContinue = Number.isFinite(numeric) && numeric > 0 && recipient.trim().length >= 20 && !loading;
-
-  async function continuePayment() {
-    if (!canContinue) return;
-    setLoading(true); setError('');
-    try {
-      const network = asset === 'SUI' ? 'SUI' : 'SOLANA';
-      const created = await powerPayApi.createIntent({
-        idempotencyKey: `send:${Crypto.randomUUID()}`,
-        source: 'SEND', network, asset, amount, fiatCurrency: asset === 'EURC' ? 'EUR' : 'USD', recipient: recipient.trim(),
-      });
-      router.push({ pathname: '/checkout/[id]', params: { id: created.intent.id, merchant: params.merchant || 'Wallet payment' } });
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to create payment'); }
-    finally { setLoading(false); }
-  }
-
-  const fiatApprox = marketRate && numeric > 0 ? `$${(numeric * Number(marketRate)).toFixed(2)}` : undefined;
-
-  return (
-    <Screen>
-      <AppHeader />
-      <Text style={styles.title}>Pay</Text>
-      <Text style={styles.subtitle}>USDC is the default payment asset. Amount and recipient become immutable when the review quote is locked.</Text>
-
-      <View style={styles.amountCard}>
-        <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor="#A6ADA8" style={styles.amountInput} accessibilityLabel="Payment amount" />
-        <Text style={styles.fiat}>{fiatApprox || `${asset} amount`}</Text>
-      </View>
-
-      <Text style={styles.label}>Pay with</Text>
-      <View style={styles.assetPills}>{assets.map((item) => <Pressable key={item} onPress={() => setAsset(item)} style={[styles.assetPill, asset === item && styles.assetPillActive]}><AssetIcon symbol={item} size={28} /><Text style={[styles.assetText, asset === item && styles.assetTextActive]}>{item}</Text></Pressable>)}</View>
-
-      <Text style={styles.label}>To</Text>
-      <TextInput value={recipient} onChangeText={setRecipient} placeholder="Wallet address" placeholderTextColor="#929A94" autoCapitalize="none" autoCorrect={false} style={styles.input} />
-
-      {(asset === 'SOL' || asset === 'SUI') ? <View style={styles.quoteCard}><Text style={styles.quoteTitle}>{asset} conversion</Text><Text style={styles.quoteValue}>{marketRate ? `1 ${asset} = $${Number(marketRate).toFixed(2)}` : 'Rate unavailable'}</Text><Text style={styles.quoteMeta}>{priceMeta || 'Fetching live price…'}</Text></View> : null}
-      {error ? <View style={styles.errorCard}><Text style={styles.errorText}>{error}</Text></View> : null}
-
-      <View style={{ marginTop: 22, paddingBottom: 26 }}><PrimaryButton label="Continue" loading={loading} disabled={!canContinue} onPress={continuePayment} /></View>
-    </Screen>
-  );
-}
-
-const styles = StyleSheet.create({
-  title: { color: colors.text, fontSize: 30, fontWeight: '700', letterSpacing: -0.8, marginTop: 4 }, subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 6 },
-  amountCard: { marginTop: 22, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, padding: 18, alignItems: 'center' }, amountInput: { color: colors.text, fontSize: 44, fontWeight: '700', textAlign: 'center', width: '100%', minHeight: 62 }, fiat: { color: colors.muted, fontSize: 13 },
-  label: { color: colors.text, fontSize: 13, fontWeight: '700', marginTop: 20, marginBottom: 8 }, assetPills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, assetPill: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 7, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: radius.md, paddingHorizontal: 11 }, assetPillActive: { borderColor: colors.primary, backgroundColor: '#F0F8F3' }, assetText: { color: colors.text, fontSize: 13, fontWeight: '600' }, assetTextActive: { color: colors.primary },
-  input: { minHeight: 54, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.surface, paddingHorizontal: 14, fontSize: 16, color: colors.text }, quoteCard: { marginTop: 16, padding: 14, borderRadius: radius.md, backgroundColor: '#F0F6F2' }, quoteTitle: { color: colors.muted, fontSize: 11, fontWeight: '700' }, quoteValue: { color: colors.text, fontSize: 20, fontWeight: '700', marginTop: 4 }, quoteMeta: { color: colors.muted, fontSize: 10, marginTop: 5 }, errorCard: { marginTop: 14, backgroundColor: '#FFF0EF', borderRadius: radius.md, padding: 12 }, errorText: { color: '#A33A30', fontSize: 12, lineHeight: 17 },
-});
+import { useResponsive } from '@/hooks/useResponsive';
+const assets=['USDC','EURC','SOL','SUI','PWRC'] as const;
+function validRecipient(value:string,asset:(typeof assets)[number]){if(asset==='SUI')return /^0x[0-9a-fA-F]{40,64}$/.test(value.trim());try{return new PublicKey(value.trim()).toBase58()===value.trim()}catch{return false}}
+export default function PayScreen(){const params=useLocalSearchParams<{recipient?:string;asset?:string;merchant?:string}>();const r=useResponsive();const [amount,setAmount]=useState('');const [asset,setAsset]=useState<(typeof assets)[number]>((assets.includes(params.asset as any)?params.asset:'USDC') as any);const [recipient,setRecipient]=useState(params.recipient||'');const [marketRate,setMarketRate]=useState<string>();const [priceMeta,setPriceMeta]=useState<string>();const [loading,setLoading]=useState(false);const [error,setError]=useState('');
+ useEffect(()=>{if(params.recipient)setRecipient(params.recipient)},[params.recipient]);useEffect(()=>{let alive=true;if(asset!=='SOL'&&asset!=='SUI'){setMarketRate(undefined);setPriceMeta(undefined);return;}powerPayApi.prices(asset,'USD').then(body=>{if(!alive)return;const price=body.prices?.transactional||body.prices?.reference;if(price?.price){setMarketRate(price.price);setPriceMeta(`${price.source==='pyth'?'Pyth transactional':'CoinGecko reference'} · ${new Date(price.observedAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`)}}).catch(()=>{if(alive){setMarketRate(undefined);setPriceMeta('Live conversion unavailable')}});return()=>{alive=false}},[asset]);
+ const numeric=Number(amount);const addressValid=useMemo(()=>validRecipient(recipient,asset),[recipient,asset]);const canContinue=Number.isFinite(numeric)&&numeric>0&&addressValid&&!loading;const fiatApprox=marketRate&&numeric>0?`$${(numeric*Number(marketRate)).toFixed(2)}`:undefined;
+ async function continuePayment(){if(!canContinue)return;setLoading(true);setError('');try{const network=asset==='SUI'?'SUI':'SOLANA';const created=await powerPayApi.createIntent({idempotencyKey:`send:${Crypto.randomUUID()}`,source:'SEND',network,asset,amount,fiatCurrency:asset==='EURC'?'EUR':'USD',recipient:recipient.trim()});router.push({pathname:'/checkout/[id]',params:{id:created.intent.id,merchant:params.merchant||'Wallet payment'}})}catch(cause){setError(cause instanceof Error?cause.message:'Unable to create payment')}finally{setLoading(false)}}
+ return <Screen><AppHeader/><View style={[styles.page,r.isTablet&&styles.pageTablet]}><View style={styles.main}><Text style={styles.kicker}>SEND PAYMENT</Text><Text style={styles.title}>Pay</Text><Text style={styles.subtitle}>Recipient, amount, asset and network become immutable when the payment review is locked.</Text><View style={styles.amountSurface}><TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor="#A6ADA8" style={styles.amountInput} accessibilityLabel="Payment amount"/><Text style={styles.fiat}>{fiatApprox||`${asset} amount`}</Text></View><Text style={styles.label}>Pay with</Text><View style={styles.assetPills}>{assets.map(item=><Pressable key={item} onPress={()=>setAsset(item)} style={[styles.assetPill,asset===item&&styles.assetPillActive]}><AssetIcon symbol={item} size={25}/><Text style={[styles.assetText,asset===item&&styles.assetTextActive]}>{item}</Text></Pressable>)}</View><Text style={styles.label}>Recipient</Text><View style={styles.recipientSurface}><TextInput value={recipient} onChangeText={setRecipient} placeholder={asset==='SUI'?'0x… Sui address':'Solana wallet address'} placeholderTextColor="#929A94" autoCapitalize="none" autoCorrect={false} style={styles.input}/><Text style={[styles.validity,addressValid&&styles.validityGood]}>{recipient?addressValid?'Valid':'Check':'Required'}</Text></View>{(asset==='SOL'||asset==='SUI')?<View style={styles.rateRow}><View><Text style={styles.rateLabel}>{asset} / USD</Text><Text style={styles.rateValue}>{marketRate?`$${Number(marketRate).toFixed(2)}`:'Unavailable'}</Text></View><Text style={styles.rateMeta}>{priceMeta||'Fetching live rate…'}</Text></View>:null}{error?<View style={styles.errorCard}><Text style={styles.errorText}>{error}</Text></View>:null}<View style={styles.footer}><PrimaryButton label="Review payment" loading={loading} disabled={!canContinue} onPress={continuePayment}/></View></View><View style={[styles.side,r.isTablet&&styles.sideTablet]}><Text style={styles.sideTitle}>What happens next</Text>{[['1','Lock details'],['2','Approve wallet'],['3','Confirm + receipt']].map(([n,t])=><View key={n} style={styles.step}><Text style={styles.stepNo}>{n}</Text><Text style={styles.stepText}>{t}</Text></View>)}<Text style={styles.sideNote}>PowerPay never silently changes a conversion quote immediately before signature.</Text></View></View></Screen>}
+const styles=StyleSheet.create({page:{marginTop:6},pageTablet:{flexDirection:'row',gap:24,alignItems:'flex-start'},main:{flex:1},side:{display:'none'},sideTablet:{display:'flex',width:220,backgroundColor:'#fff',borderRadius:20,padding:18,marginTop:72,shadowColor:'#0A120D',shadowOpacity:.035,shadowRadius:14,shadowOffset:{width:0,height:7}},kicker:{color:colors.primary,fontSize:9,fontWeight:'800',letterSpacing:1,marginTop:6},title:{color:colors.text,fontSize:31,fontWeight:'700',letterSpacing:-.9,marginTop:3},subtitle:{color:colors.muted,fontSize:12,lineHeight:18,marginTop:5},amountSurface:{marginTop:20,backgroundColor:'#fff',borderRadius:21,padding:17,alignItems:'center',shadowColor:'#0A120D',shadowOpacity:.045,shadowRadius:16,shadowOffset:{width:0,height:8}},amountInput:{color:colors.text,fontSize:42,fontWeight:'700',textAlign:'center',width:'100%',minHeight:58},fiat:{color:colors.muted,fontSize:11},label:{color:colors.text,fontSize:12,fontWeight:'750',marginTop:18,marginBottom:8},assetPills:{flexDirection:'row',flexWrap:'wrap',gap:7},assetPill:{minHeight:43,flexDirection:'row',alignItems:'center',gap:6,backgroundColor:'#F0F3F1',borderRadius:13,paddingHorizontal:10},assetPillActive:{backgroundColor:'#E5F3EA'},assetText:{color:colors.text,fontSize:11,fontWeight:'650'},assetTextActive:{color:colors.primary,fontWeight:'800'},recipientSurface:{minHeight:54,borderRadius:16,backgroundColor:'#fff',flexDirection:'row',alignItems:'center',paddingHorizontal:13,shadowColor:'#0A120D',shadowOpacity:.03,shadowRadius:10,shadowOffset:{width:0,height:5}},input:{flex:1,fontSize:14,color:colors.text},validity:{fontSize:9,color:colors.warning,fontWeight:'800'},validityGood:{color:colors.success},rateRow:{marginTop:12,padding:11,borderRadius:14,backgroundColor:'#EDF5F0',flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:12},rateLabel:{color:colors.muted,fontSize:8,fontWeight:'800'},rateValue:{color:colors.text,fontSize:16,fontWeight:'750',marginTop:2},rateMeta:{color:colors.muted,fontSize:8,textAlign:'right',maxWidth:180},errorCard:{marginTop:12,backgroundColor:'#FFF0EF',borderRadius:14,padding:11},errorText:{color:'#A33A30',fontSize:11,lineHeight:16},footer:{marginTop:20},sideTitle:{color:colors.text,fontSize:15,fontWeight:'800'},step:{flexDirection:'row',alignItems:'center',gap:9,marginTop:12},stepNo:{width:24,height:24,borderRadius:9,backgroundColor:'#E7F2EB',textAlign:'center',textAlignVertical:'center',color:colors.primary,fontWeight:'800',fontSize:10},stepText:{color:colors.text,fontSize:11,fontWeight:'650'},sideNote:{color:colors.muted,fontSize:9,lineHeight:15,marginTop:18}});

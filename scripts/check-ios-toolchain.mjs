@@ -1,31 +1,5 @@
 import { execFileSync } from 'node:child_process';
 import process from 'node:process';
-
-if (process.platform !== 'darwin') {
-  console.log('iOS toolchain check skipped: iOS Simulator requires macOS + Xcode.');
-  process.exit(0);
-}
-
-function run(cmd, args = []) {
-  try {
-    return execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  } catch (error) {
-    const stderr = error?.stderr?.toString?.().trim() || error?.message || String(error);
-    throw new Error(`${cmd} ${args.join(' ')} failed:\n${stderr}`);
-  }
-}
-
-try {
-  const developerDir = run('xcode-select', ['-p']);
-  const xcodeVersion = run('xcodebuild', ['-version']);
-  const simctl = run('xcrun', ['--find', 'simctl']);
-  run('xcrun', ['simctl', 'list', 'devices', 'available']);
-  console.log(`Xcode developer directory: ${developerDir}`);
-  console.log(xcodeVersion);
-  console.log(`simctl: ${simctl}`);
-  console.log('iOS Simulator toolchain check passed.');
-} catch (error) {
-  console.error(String(error?.message || error));
-  console.error(`\nRepair checklist:\n  1. Install/open full Xcode (not only Command Line Tools).\n  2. sudo xcode-select -s /Applications/Xcode.app/Contents/Developer\n  3. sudo xcodebuild -runFirstLaunch\n  4. sudo xcodebuild -license accept\n  5. In Xcode > Settings > Components/Platforms, install an iOS Simulator runtime.\n  6. Re-run: pnpm ios:doctor`);
-  process.exit(1);
-}
+if(process.platform!=='darwin'){console.log('iOS toolchain check skipped: iOS Simulator requires macOS + Xcode.');process.exit(0)}
+function run(cmd,args=[]){try{return execFileSync(cmd,args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim()}catch(error){const stderr=error?.stderr?.toString?.().trim()||error?.message||String(error);throw new Error(`${cmd} ${args.join(' ')} failed:\n${stderr}`)}}
+try{const developerDir=run('xcode-select',['-p']);if(!developerDir.includes('/Applications/Xcode.app/Contents/Developer')) console.warn(`Warning: active developer dir is ${developerDir}; full Xcode is recommended.`);const xcodeVersion=run('xcodebuild',['-version']);const simctl=run('xcrun',['--find','simctl']);const runtimes=run('xcrun',['simctl','list','runtimes','available']);const devices=run('xcrun',['simctl','list','devices','available']);console.log(`Xcode developer directory: ${developerDir}`);console.log(xcodeVersion);console.log(`simctl: ${simctl}`);console.log(runtimes||'No available simulator runtimes.');console.log(devices||'No available simulator devices.');if(!/iOS/i.test(runtimes))throw new Error('No available iOS Simulator runtime was found. Install one in Xcode > Settings > Components.');console.log('iOS Simulator toolchain check passed.')}catch(error){console.error(String(error?.message||error));console.error(`\nRepair checklist:\n  1. Close any shell whose current folder was deleted, then cd into the current PowerPay repository.\n  2. Install/open full Xcode.\n  3. sudo xcode-select -s /Applications/Xcode.app/Contents/Developer\n  4. sudo xcodebuild -runFirstLaunch\n  5. sudo xcodebuild -license accept\n  6. Xcode > Settings > Components: install an iOS Simulator runtime.\n  7. pnpm ios:simulator:restart\n  8. pnpm ios:doctor`);process.exit(1)}

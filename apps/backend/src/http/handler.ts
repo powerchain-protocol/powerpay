@@ -1,4 +1,5 @@
 import { capabilitiesFor } from '@powerpay/capabilities';
+import { API_ROUTES, POWERPAY_API_VERSION, POWERPAY_HEADERS, createOpenApiDocument } from '@powerpay/api-contract';
 import { parseQrPayload, validateQrPayload } from '@powerpay/qr';
 import { assertNonceAvailable, InMemoryRateLimiter, type ReplayNonceStore } from '@powerpay/security';
 import { createIdempotencyKey, type PaymentAsset, type PaymentNetwork, type PaymentSource } from '@powerpay/payment-core';
@@ -23,12 +24,50 @@ export interface BackendHandlerDependencies {
   allowDevelopmentIdentity?: boolean;
   notifications?: NotificationDirectory;
   getSolanaPortfolio?: (address: string) => Promise<unknown>;
+  getSolanaOverview?: () => Promise<unknown>;
+  getSolanaPrograms?: () => Promise<unknown>;
+  getSolanaMarket?: (mint: string) => Promise<unknown | null>;
+  getSolanaAsset?: (mint: string) => Promise<unknown | null>;
+  defaultSolanaMarketMint?: string;
+  getSuiOverview?: () => Promise<unknown>;
+  getSuiPackages?: () => Promise<unknown>;
+  getSuiMarket?: (coinType: string) => Promise<unknown | null>;
+  getSuiAsset?: (coinType: string) => Promise<unknown | null>;
+  defaultSuiMarketCoinType?: string;
   readiness?: () => unknown;
+  systemOverview?: () => unknown;
+  allowedOrigins?: string[];
 }
+
 
 const limiter = new InMemoryRateLimiter(60, 60_000);
 
+
 export function createBackendHandler(deps: BackendHandlerDependencies) {
+  const core = createBackendHandlerCore(deps);
+  return async function powerPayHttpHandler(request: Request): Promise<Response> {
+    const started = Date.now();
+    const requestId = request.headers.get(POWERPAY_HEADERS.requestId) || crypto.randomUUID();
+    const headers = new Headers(request.headers);
+    headers.set(POWERPAY_HEADERS.requestId, requestId);
+    const normalizedRequest = new Request(request, { headers });
+
+    const requestPath = new URL(request.url).pathname;
+    const actionCorsRequest = requestPath === '/actions.json' || requestPath.startsWith('/api/actions/');
+    if (request.method === 'OPTIONS' && !actionCorsRequest) {
+      const origin = request.headers.get('origin');
+      if (origin && !originAllowed(origin, deps.allowedOrigins || [])) {
+        return decorateResponse(jsonError('ORIGIN_NOT_ALLOWED', 'Origin is not allowed by this PowerPay API deployment', requestId, 403), normalizedRequest, deps, requestId, started);
+      }
+      return decorateResponse(new Response(null, { status: 204 }), normalizedRequest, deps, requestId, started);
+    }
+
+    const response = await core(normalizedRequest);
+    return decorateResponse(response, normalizedRequest, deps, requestId, started);
+  };
+}
+
+function createBackendHandlerCore(deps: BackendHandlerDependencies) {
   return async function handle(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const requestId = request.headers.get('x-request-id') || crypto.randomUUID();
@@ -44,9 +83,125 @@ export function createBackendHandler(deps: BackendHandlerDependencies) {
 
       if (request.method === 'OPTIONS' && (url.pathname === '/actions.json' || url.pathname.startsWith('/api/actions/'))) return new Response(null, { status: 204, headers: SOLANA_ACTION_HEADERS });
       if (request.method === 'GET' && url.pathname === '/actions.json') return actionJson(actionsManifest());
-      if (request.method === 'GET' && url.pathname === '/api/v1/health') return json({ ok: true, service: 'powerpay-backend', requestId });
-      if (request.method === 'GET' && url.pathname === '/api/v1/readiness') return json({ ok: true, readiness: deps.readiness ? deps.readiness() : { configured: false }, requestId });
+      if (request.method === 'GET' && url.pathname === API_ROUTES.health) return json({ ok: true, service: 'powerpay-backend', apiVersion: POWERPAY_API_VERSION, requestId });
       if (request.method === 'GET' && url.pathname === '/api/v1/capabilities') return json({ features: deps.features, networks: { SOLANA: capabilitiesFor('SOLANA', deps.features), SUI: capabilitiesFor('SUI', deps.features) }, requestId });
+      if (request.method === 'GET' && (url.pathname === API_ROUTES.ready || url.pathname === API_ROUTES.readiness)) return json({ ok: true, readiness: deps.readiness ? deps.readiness() : { configured: false }, requestId });
+      if (request.method === 'GET' && url.pathname === API_ROUTES.systemOverview) return json({ system: deps.systemOverview ? deps.systemOverview() : { apiVersion: POWERPAY_API_VERSION }, requestId });
+      if (request.method === 'GET' && url.pathname === API_ROUTES.openApi) return json(createOpenApiDocument(new URL(request.url).origin));
+      if (request.method === 'GET' && url.pathname === '/api/v1/rpc/health') {
+        if (!deps.getSolanaOverview) return jsonError('SOLANA_UNAVAILABLE', 'Solana RPC health service is not configured', requestId, 503);
+        try {
+          const overview = await deps.getSolanaOverview() as Record<string, unknown>;
+          return json({ network: overview.network ?? 'SOLANA', cluster: overview.cluster ?? null, rpcProfile: overview.rpcProfile ?? null, rpc: overview.rpc ?? null, observedAt: overview.observedAt ?? new Date().toISOString(), requestId });
+        } catch (cause) { return jsonError('SOLANA_UNAVAILABLE', cause instanceof Error ? cause.message : 'Solana RPC health unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && url.pathname === '/api/v1/programs/verify') {
+        if (!deps.getSolanaPrograms) return jsonError('SOLANA_UNAVAILABLE', 'Solana program verification service is not configured', requestId, 503);
+        try {
+          const [programs, overview] = await Promise.all([
+            deps.getSolanaPrograms() as Promise<Array<Record<string, unknown>>>,
+            deps.getSolanaOverview ? deps.getSolanaOverview().catch(() => null) : Promise.resolve(null),
+          ]);
+          const overviewRecord = overview && typeof overview === 'object' ? overview as Record<string, unknown> : null;
+          return json({
+            network: overviewRecord?.network ?? 'SOLANA',
+            cluster: overviewRecord?.cluster ?? null,
+            rpcProfile: overviewRecord?.rpcProfile ?? null,
+            programs,
+            summary: summarizeProgramVerification(programs),
+            observedAt: overviewRecord?.observedAt ?? new Date().toISOString(),
+            requestId,
+          });
+        } catch (cause) { return jsonError('SOLANA_UNAVAILABLE', cause instanceof Error ? cause.message : 'Solana program verification unavailable', requestId, 503); }
+      }
+      const canonicalMintMatch = url.pathname.match(/^\/api\/v1\/token\/mint\/([^/]+)$/);
+      if (request.method === 'GET' && canonicalMintMatch) {
+        if (!deps.getSolanaAsset) return jsonError('SOLANA_UNAVAILABLE', 'Solana mint inspection service is not configured', requestId, 503);
+        const mint = decodeURIComponent(canonicalMintMatch[1]);
+        if (!isLikelySolanaAddress(mint)) return jsonError('VALIDATION_ERROR', 'mint must be a valid Solana address', requestId, 400);
+        try {
+          const asset = await deps.getSolanaAsset(mint);
+          return asset ? json({ mint: asset, requestId }) : jsonError('ASSET_NOT_FOUND', 'Solana mint was not found', requestId, 404);
+        } catch (cause) { return jsonError('ASSET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Mint inspection unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && url.pathname === '/api/v1/token/market') {
+        if (!deps.getSolanaMarket) return jsonError('SOLANA_UNAVAILABLE', 'Solana market service is not configured', requestId, 503);
+        const mint = url.searchParams.get('mint') || '';
+        if (!mint) return jsonError('VALIDATION_ERROR', 'mint is required for the canonical v1 market route', requestId, 400);
+        if (!isLikelySolanaAddress(mint)) return jsonError('VALIDATION_ERROR', 'mint must be a valid Solana address', requestId, 400);
+        try {
+          const market = await deps.getSolanaMarket(mint);
+          return market ? json({ market, requestId }) : jsonError('ASSET_NOT_FOUND', 'Solana mint was not found', requestId, 404);
+        } catch (cause) { return jsonError('MARKET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Market data unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && (url.pathname === '/api/v1/solana/overview' || url.pathname === '/api/solana/overview')) {
+        if (!deps.getSolanaOverview) return jsonError('SOLANA_UNAVAILABLE', 'Solana overview service is not configured', requestId, 503);
+        try { return json({ overview: await deps.getSolanaOverview(), requestId }); }
+        catch (cause) { return jsonError('SOLANA_UNAVAILABLE', cause instanceof Error ? cause.message : 'Solana overview unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && url.pathname === '/api/v1/solana/programs') {
+        if (!deps.getSolanaPrograms) return jsonError('SOLANA_UNAVAILABLE', 'Solana program service is not configured', requestId, 503);
+        try { return json({ programs: await deps.getSolanaPrograms(), requestId }); }
+        catch (cause) { return jsonError('SOLANA_UNAVAILABLE', cause instanceof Error ? cause.message : 'Solana programs unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && (url.pathname === '/api/v1/solana/market' || url.pathname === '/api/token/market')) {
+        if (!deps.getSolanaMarket) return jsonError('SOLANA_UNAVAILABLE', 'Solana market service is not configured', requestId, 503);
+        const mint = url.searchParams.get('mint') || (url.pathname === '/api/token/market' ? deps.defaultSolanaMarketMint : undefined) || '';
+        if (!mint) return jsonError('VALIDATION_ERROR', 'mint is required', requestId, 400);
+        if (!isLikelySolanaAddress(mint)) return jsonError('VALIDATION_ERROR', 'mint must be a valid Solana address', requestId, 400);
+        try {
+          const market = await deps.getSolanaMarket(mint);
+          return market ? json({ market, requestId }) : jsonError('ASSET_NOT_FOUND', 'Solana mint was not found', requestId, 404);
+        } catch (cause) { return jsonError('MARKET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Market data unavailable', requestId, 503); }
+      }
+      const solanaAssetMatch = url.pathname.match(/^\/api\/v1\/solana\/assets\/([^/]+)$/) || url.pathname.match(/^\/api\/assets\/([^/]+)$/);
+      if (request.method === 'GET' && solanaAssetMatch) {
+        if (!deps.getSolanaAsset) return jsonError('SOLANA_UNAVAILABLE', 'Solana asset service is not configured', requestId, 503);
+        const mint = decodeURIComponent(solanaAssetMatch[1]);
+        if (!isLikelySolanaAddress(mint)) return jsonError('VALIDATION_ERROR', 'mint must be a valid Solana address', requestId, 400);
+        try {
+          const asset = await deps.getSolanaAsset(mint);
+          return asset ? json({ asset, requestId }) : jsonError('ASSET_NOT_FOUND', 'Solana mint was not found', requestId, 404);
+        } catch (cause) { return jsonError('ASSET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Asset data unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && (url.pathname === '/api/v1/sui/overview' || url.pathname === '/api/sui/overview')) {
+        if (!deps.getSuiOverview) return jsonError('SUI_UNAVAILABLE', 'Sui overview service is not configured', requestId, 503);
+        try { return json({ overview: await deps.getSuiOverview(), requestId }); }
+        catch (cause) { return jsonError('SUI_UNAVAILABLE', cause instanceof Error ? cause.message : 'Sui overview unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && (url.pathname === '/api/v1/sui/packages' || url.pathname === '/api/sui/packages' || url.pathname === '/api/v1/sui/programs' || url.pathname === '/api/sui/programs')) {
+        if (!deps.getSuiPackages) return jsonError('SUI_UNAVAILABLE', 'Sui package service is not configured', requestId, 503);
+        try {
+          return json({
+            packages: await deps.getSuiPackages(),
+            semanticType: 'MOVE_PACKAGES',
+            deprecatedAlias: url.pathname.endsWith('/programs'),
+            requestId,
+          });
+        }
+        catch (cause) { return jsonError('SUI_UNAVAILABLE', cause instanceof Error ? cause.message : 'Sui packages unavailable', requestId, 503); }
+      }
+      if (request.method === 'GET' && (url.pathname === '/api/v1/sui/market' || url.pathname === '/api/sui/market' || url.pathname === '/api/sui/token/market')) {
+        if (!deps.getSuiMarket) return jsonError('SUI_UNAVAILABLE', 'Sui market service is not configured', requestId, 503);
+        const compatibilityMarket = url.pathname === '/api/sui/market' || url.pathname === '/api/sui/token/market';
+        const coinType = url.searchParams.get('coinType') || url.searchParams.get('type') || (compatibilityMarket ? deps.defaultSuiMarketCoinType : undefined) || '';
+        if (!coinType) return jsonError('VALIDATION_ERROR', 'coinType is required', requestId, 400);
+        if (!isLikelySuiCoinType(coinType)) return jsonError('VALIDATION_ERROR', 'coinType must be a valid Sui coin type', requestId, 400);
+        try {
+          const market = await deps.getSuiMarket(coinType);
+          return market ? json({ market, requestId }) : jsonError('ASSET_NOT_FOUND', 'Sui coin type was not found', requestId, 404);
+        } catch (cause) { return jsonError('MARKET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Sui market data unavailable', requestId, 503); }
+      }
+      const suiAssetMatch = url.pathname.match(/^\/api\/v1\/sui\/assets\/([^/]+)$/) || url.pathname.match(/^\/api\/sui\/assets\/([^/]+)$/);
+      if (request.method === 'GET' && suiAssetMatch) {
+        if (!deps.getSuiAsset) return jsonError('SUI_UNAVAILABLE', 'Sui asset service is not configured', requestId, 503);
+        const coinType = decodeURIComponent(suiAssetMatch[1]);
+        if (!isLikelySuiCoinType(coinType)) return jsonError('VALIDATION_ERROR', 'coinType must be a valid Sui coin type', requestId, 400);
+        try {
+          const asset = await deps.getSuiAsset(coinType);
+          return asset ? json({ asset, requestId }) : jsonError('ASSET_NOT_FOUND', 'Sui coin type was not found', requestId, 404);
+        } catch (cause) { return jsonError('ASSET_UNAVAILABLE', cause instanceof Error ? cause.message : 'Sui asset data unavailable', requestId, 503); }
+      }
       if (request.method === 'GET' && url.pathname === '/api/v1/account') {
         if (!identity || !accountId) return jsonError('UNAUTHORIZED', 'Authentication required', requestId, 401);
         return json({ account: account ?? { id: accountId, externalId: identity.userId }, requestId });
@@ -267,6 +422,51 @@ export function createBackendHandler(deps: BackendHandlerDependencies) {
   };
 }
 
+
+function decorateResponse(response: Response, request: Request, deps: BackendHandlerDependencies, requestId: string, started: number): Response {
+  const durationMs = Math.max(0, Date.now() - started);
+  const headers = new Headers(response.headers);
+  headers.set(POWERPAY_HEADERS.requestId, requestId);
+  headers.set(POWERPAY_HEADERS.apiVersion, POWERPAY_API_VERSION);
+  headers.set('x-content-type-options', 'nosniff');
+  headers.set('referrer-policy', 'no-referrer');
+  headers.set('server-timing', `app;dur=${durationMs}`);
+  headers.set('vary', appendVary(headers.get('vary'), ['origin', POWERPAY_HEADERS.cluster, POWERPAY_HEADERS.rpcProfile, POWERPAY_HEADERS.suiNetwork, POWERPAY_HEADERS.suiRpcProfile]));
+
+  const origin = request.headers.get('origin');
+  if (origin && originAllowed(origin, deps.allowedOrigins || [])) {
+    headers.set('access-control-allow-origin', origin);
+    headers.set('access-control-allow-credentials', 'true');
+  }
+  if (request.method === 'OPTIONS') {
+    headers.set('access-control-allow-methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    headers.set('access-control-allow-headers', [
+      'authorization', 'content-type', POWERPAY_HEADERS.idempotencyKey, POWERPAY_HEADERS.requestId,
+      POWERPAY_HEADERS.cluster, POWERPAY_HEADERS.rpcProfile, POWERPAY_HEADERS.suiNetwork, POWERPAY_HEADERS.suiRpcProfile,
+      'x-powerpay-development-user',
+    ].join(', '));
+    headers.set('access-control-max-age', '600');
+  }
+  console.info(JSON.stringify({ event: 'powerpay.request', requestId, method: request.method, path: new URL(request.url).pathname, status: response.status, durationMs }));
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function originAllowed(origin: string, allowed: string[]): boolean {
+  if (!allowed.length) return false;
+  try {
+    const normalized = new URL(origin).origin;
+    return allowed.some((entry) => {
+      try { return new URL(entry).origin === normalized; } catch { return false; }
+    });
+  } catch { return false; }
+}
+
+function appendVary(current: string | null, values: string[]): string {
+  const entries = new Set((current || '').split(',').map((value) => value.trim()).filter(Boolean));
+  for (const value of values) entries.add(value);
+  return [...entries].join(', ');
+}
+
 function developmentIdentity(request: Request, deps: BackendHandlerDependencies): RequestIdentity | null {
   if (!deps.allowDevelopmentIdentity || deps.authRequired) return null;
   const userId = request.headers.get('x-powerpay-development-user');
@@ -310,6 +510,32 @@ function findTransactionSignature(value: unknown): string | null {
 
 function publicCheckout(checkout: CheckoutRecord) {
   return { id: checkout.id, merchant: { id: checkout.merchant.id, name: checkout.merchant.name, trustStatus: checkout.merchant.trustStatus }, amount: checkout.amount, asset: checkout.asset, network: checkout.network, reference: checkout.reference, expiresAt: checkout.expiresAt, multiUse: checkout.multiUse };
+}
+
+function isLikelySolanaAddress(value: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value);
+}
+
+function isLikelySuiCoinType(value: string): boolean {
+  return /^0x[0-9a-fA-F]{1,64}::[A-Za-z_][A-Za-z0-9_]*::[A-Za-z_][A-Za-z0-9_]*$/.test(value);
+}
+
+
+function summarizeProgramVerification(programs: Array<Record<string, unknown>>) {
+  const groups: Record<string, { total: number; configured: number; active: number; verified: number }> = {};
+  let configured = 0;
+  let active = 0;
+  let verified = 0;
+  for (const program of programs) {
+    const domain = typeof program.domain === 'string' ? program.domain : 'POWERPAY';
+    const group = groups[domain] ?? { total: 0, configured: 0, active: 0, verified: 0 };
+    group.total += 1;
+    if (typeof program.programId === 'string' && program.programId) { group.configured += 1; configured += 1; }
+    if (program.status === 'ACTIVE') { group.active += 1; active += 1; }
+    if (program.deploymentVerified === true) { group.verified += 1; verified += 1; }
+    groups[domain] = group;
+  }
+  return { total: programs.length, configured, active, verified, groups };
 }
 
 async function bodyJson<T>(request: Request): Promise<T> {

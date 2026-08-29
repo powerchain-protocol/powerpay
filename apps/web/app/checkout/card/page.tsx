@@ -1,0 +1,3 @@
+import { Topbar } from '../../../components/topbar'; import { SiteHeader } from '../../../components/site-header'; import { SiteFooter } from '../../../components/site-footer'; import { CreditCard } from '../../../components/credit-card';
+export const metadata = { title: 'Card funding' };
+export default async function CardPage({ searchParams }: { searchParams: Promise<{ amount?: string; asset?: string }> }) { const params = await searchParams; return <div className="site-shell"><Topbar/><SiteHeader active="checkout"/><main className="funding-page"><CreditCard initialAmount={params.amount || '100'} initialAsset={params.asset === 'EURC' ? 'EURC' : 'USDC'} /></main><SiteFooter/></div>; }

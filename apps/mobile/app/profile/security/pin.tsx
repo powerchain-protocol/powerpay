@@ -54,7 +54,7 @@ export default function PinScreen() {
   );
 }
 
-function Key({ label, onPress }: { label: string; onPress: () => void }) {
+function Key({ label, onPress }: { label: string; onPress: () => void | Promise<void> }) {
   return <Pressable onPress={onPress} style={({ pressed }) => [styles.key, pressed && { backgroundColor: '#E8EDE9' }]}><Text style={styles.keyText}>{label}</Text></Pressable>;
 }
 

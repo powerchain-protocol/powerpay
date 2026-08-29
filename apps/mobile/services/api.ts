@@ -1,56 +1,74 @@
+import { PowerPayApiClient, PowerPayApiError } from '@powerpay/api-client';
 import { createIdempotencyKey, type PaymentAsset, type PaymentNetwork, type PaymentSource } from '@powerpay/payment-core';
+import type { RpcProfile, SolanaCluster, SuiNetwork } from '@powerpay/api-contract';
 
 let authTokenProvider: undefined | (() => Promise<string | undefined>);
 
 export function configurePowerPayApiAuth(provider: typeof authTokenProvider) { authTokenProvider = provider; }
+export { PowerPayApiError };
 
 const baseUrl = (process.env.EXPO_PUBLIC_POWERPAY_API_URL || 'http://localhost:8787').replace(/\/$/, '');
 const developmentUser = process.env.EXPO_PUBLIC_POWERPAY_DEVELOPMENT_USER || undefined;
+const cluster = normalizeCluster(process.env.EXPO_PUBLIC_SOLANA_CLUSTER);
+const suiNetwork = normalizeSuiNetwork(process.env.EXPO_PUBLIC_SUI_NETWORK);
 
-export class PowerPayApiError extends Error {
-  constructor(readonly code: string, message: string, readonly status: number) { super(message); }
-}
-
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = authTokenProvider ? await authTokenProvider() : undefined;
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    headers: { 'content-type': 'application/json', accept: 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...(!token && developmentUser ? { 'x-powerpay-development-user': developmentUser } : {}), ...(init.headers || {}) },
-  });
-  const body = await response.json().catch(() => null) as any;
-  if (!response.ok) throw new PowerPayApiError(body?.error?.code || 'API_ERROR', body?.error?.message || body?.message || `PowerPay API returned ${response.status}`, response.status);
-  return body as T;
-}
+const client = new PowerPayApiClient({
+  baseUrl,
+  timeoutMs: 15_000,
+  getContext: () => ({ cluster, rpcProfile: 'managed', suiNetwork, suiRpcProfile: 'managed' }),
+  getHeaders: async () => {
+    const token = authTokenProvider ? await authTokenProvider() : undefined;
+    if (token) return { authorization: `Bearer ${token}` };
+    return developmentUser ? { 'x-powerpay-development-user': developmentUser } : {};
+  },
+});
 
 export const powerPayApi = {
-  resolveQr(raw: string) {
-    return request<any>('/api/v1/qr/resolve', { method: 'POST', body: JSON.stringify({ raw }) });
-  },
+  resolveQr(raw: string) { return client.resolveQr(raw); },
   createCheckoutIntent(checkoutId: string, nonce?: string, idempotencyKey?: string) {
     const key = idempotencyKey || (nonce ? `checkout:${checkoutId}:${nonce}` : createIdempotencyKey('checkout'));
-    return request<any>(`/api/v1/checkouts/${encodeURIComponent(checkoutId)}/intents`, { method: 'POST', headers: { 'x-idempotency-key': key }, body: JSON.stringify({ nonce, idempotencyKey: key }) });
+    return client.createCheckoutIntent(checkoutId, { nonce, idempotencyKey: key });
   },
   createIntent(input: { idempotencyKey: string; source: PaymentSource; network: PaymentNetwork; asset: PaymentAsset; amount: string; fiatCurrency?: 'USD' | 'EUR'; recipient: string; merchantId?: string; reference?: string; checkoutId?: string; nonce?: string; expiresAt?: string }) {
-    return request<any>('/api/v1/payments/intents', { method: 'POST', headers: { 'x-idempotency-key': input.idempotencyKey }, body: JSON.stringify(input) });
+    return client.createIntent(input);
   },
-  getIntent(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}`); },
-  lockIntent(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/lock`, { method: 'POST', body: '{}' }); },
-  cancelIntent(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/cancel`, { method: 'POST', body: '{}' }); },
-  ledger(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/ledger`); },
-  listAttempts(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts`); },
-  createAttempt(id: string, walletAddress: string, feeQuoteId: string, idempotencyKey: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts`, { method: 'POST', headers: { 'x-idempotency-key': idempotencyKey }, body: JSON.stringify({ walletAddress, feeQuoteId, idempotencyKey }) }); },
-  abortAttempt(id: string, attemptId: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts/${encodeURIComponent(attemptId)}/abort`, { method: 'POST', body: '{}' }); },
-  markSigned(id: string, attemptId: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts/${encodeURIComponent(attemptId)}/signed`, { method: 'POST', body: '{}' }); },
-  submit(id: string, attemptId: string, signedTransaction: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts/${encodeURIComponent(attemptId)}/submit`, { method: 'POST', body: JSON.stringify({ signedTransaction }) }); },
-  reconcile(id: string, attemptId: string, feeQuoteId?: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/attempts/${encodeURIComponent(attemptId)}/reconcile`, { method: 'POST', body: JSON.stringify(feeQuoteId ? { feeQuoteId } : {}) }); },
-  receipt(id: string) { return request<any>(`/api/v1/payments/intents/${encodeURIComponent(id)}/receipt`); },
-  account() { return request<any>('/api/v1/account'); },
-  wallets() { return request<any>('/api/v1/wallets'); },
-  solanaPortfolio(address: string) { return request<any>(`/api/v1/portfolio/solana?address=${encodeURIComponent(address)}`); },
-  activity(limit = 50) { return request<any>(`/api/v1/activity?limit=${Math.max(1, Math.min(limit, 100))}`); },
-  notifications(limit = 50) { return request<any>(`/api/v1/notifications?limit=${Math.max(1, Math.min(limit, 100))}`); },
-  markNotificationRead(id: string) { return request<any>(`/api/v1/notifications/${encodeURIComponent(id)}/read`, { method: 'POST', body: '{}' }); },
-  markAllNotificationsRead() { return request<any>('/api/v1/notifications/read-all', { method: 'POST', body: '{}' }); },
-  capabilities() { return request<any>('/api/v1/capabilities'); },
-  prices(base: string, quote: 'USD' | 'EUR' = 'USD') { return request<any>(`/api/v1/prices?base=${encodeURIComponent(base)}&quote=${quote}`); },
+  getIntent(id: string) { return client.getIntent(id); },
+  lockIntent(id: string) { return client.lockIntent(id); },
+  cancelIntent(id: string) { return client.cancelIntent(id); },
+  ledger(id: string) { return client.ledger(id); },
+  listAttempts(id: string) { return client.listAttempts(id); },
+  createAttempt(id: string, walletAddress: string, feeQuoteId: string, idempotencyKey: string) { return client.createAttempt(id, { walletAddress, feeQuoteId, idempotencyKey }); },
+  abortAttempt(id: string, attemptId: string) { return client.abortAttempt(id, attemptId); },
+  markSigned(id: string, attemptId: string) { return client.markSigned(id, attemptId); },
+  submit(id: string, attemptId: string, signedTransaction: string) { return client.submit(id, attemptId, signedTransaction); },
+  reconcile(id: string, attemptId: string, feeQuoteId?: string) { return client.reconcile(id, attemptId, feeQuoteId); },
+  receipt(id: string) { return client.receipt(id); },
+  account() { return client.account(); },
+  wallets() { return client.wallets(); },
+  solanaPortfolio(address: string) { return client.solanaPortfolio(address); },
+  activity(limit = 50) { return client.activity(limit); },
+  notifications(limit = 50) { return client.notifications(limit); },
+  markNotificationRead(id: string) { return client.markNotificationRead(id); },
+  markAllNotificationsRead() { return client.markAllNotificationsRead(); },
+  capabilities() { return client.capabilities(); },
+  prices(base: string, quote: 'USD' | 'EUR' = 'USD') { return client.prices(base, quote); },
+  systemOverview() { return client.systemOverview(); },
+  rpcHealth() { return client.rpcHealth(); },
+  solanaOverview() { return client.solanaOverview(); },
+  solanaPrograms() { return client.solanaPrograms(); },
+  solanaMarket(mint: string) { return client.solanaMarket(mint); },
+  solanaAsset(mint: string) { return client.solanaAsset(mint); },
+  suiOverview() { return client.suiOverview(); },
+  suiPackages() { return client.suiPackages(); },
+  suiMarket(coinType: string) { return client.suiMarket(coinType); },
+  suiAsset(coinType: string) { return client.suiAsset(coinType); },
 };
+
+function normalizeCluster(value: string | undefined): SolanaCluster {
+  return value === 'mainnet-beta' ? 'mainnet-beta' : 'devnet';
+}
+function normalizeSuiNetwork(value: string | undefined): SuiNetwork {
+  return value === 'mainnet' || value === 'testnet' ? value : 'devnet';
+}
+
+export type MobileRpcProfile = RpcProfile;

@@ -1,3 +1,6 @@
+import { PowerPayApiClient } from '@powerpay/api-client';
+import { readNetworkPreferences } from './network-preferences';
+
 export type CheckoutAsset = 'USDC' | 'EURC' | 'SOL' | 'PWRC';
 export type PaymentStatus = 'CREATED' | 'LOCKED' | 'SIGNING' | 'SIGNED' | 'SUBMITTED' | 'CONFIRMING' | 'CONFIRMED' | 'SETTLING' | 'SETTLED' | 'FAILED' | 'CANCELLED' | 'EXPIRED' | 'RECOVERY_REQUIRED';
 
@@ -52,15 +55,17 @@ async function browserAuthHeader(): Promise<Record<string, string>> {
   } catch { return {}; }
 }
 
+const browserApi = new PowerPayApiClient({
+  baseUrl: configuredApiBase,
+  timeoutMs: 15_000,
+  getHeaders: browserAuthHeader,
+  getContext: () => {
+    const preferences = readNetworkPreferences();
+    return { cluster: preferences.cluster, rpcProfile: preferences.rpcProfile };
+  },
+});
+
 export async function powerPayFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const auth = await browserAuthHeader();
-  const callerHeaders = (init?.headers || {}) as Record<string, string>;
-  const response = await fetch(apiUrl(path), {
-    ...init,
-    headers: { 'content-type': 'application/json', ...auth, ...callerHeaders },
-    cache: 'no-store',
-  });
-  const payload = await response.json().catch(() => ({})) as T & { error?: { code?: string; message?: string } };
-  if (!response.ok) throw new Error(payload.error?.message || `PowerPay API returned ${response.status}`);
-  return payload;
+  return browserApi.request<T>(path, init);
 }
+

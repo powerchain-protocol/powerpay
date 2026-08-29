@@ -92,3 +92,22 @@ pnpm --filter @powerpay/mobile start:clear
 ```
 
 Do not use `EXPO_NO_WEB_SETUP=1` to hide missing web dependencies in this repository; web is an intentional supported platform.
+
+## Expo SDK 57 release line
+
+The PowerPay mobile workspace is pinned to the current SDK 57 runtime packages used by this release:
+
+- `expo@57.0.17`
+- `expo-router@57.0.17`
+- `expo-camera@57.0.4`
+- `@expo/cli@57.0.18`
+
+Do not change only one Expo package manually. After dependency installation, use `expo install --check` / `expo-doctor` to keep the native module set aligned.
+
+For a non-destructive Simulator restart:
+
+```bash
+pnpm ios:simulator:restart
+```
+
+This shuts down running simulator devices, restarts the Simulator app and lists available devices. It does not erase simulator contents.

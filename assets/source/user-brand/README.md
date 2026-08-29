@@ -1,8 +1,8 @@
 # PowerPay user-supplied brand sources
 
-The five attachment records in `manifest.json` are the authoritative source visuals for PWRC, wPWRC and the PowerPay/PowerChain mark variants.
+The current PWRC, wPWRC, green, white and dark PowerPay/PowerChain visuals are installed as the authoritative asset sources. Original binaries are retained under `assets/source/user-brand/originals/` and SHA-256 provenance is recorded in `installed.json` and the public asset manifest.
 
-The source binaries are intentionally not reconstructed from screenshots or approximated. Materialize the original files, then run:
+To replace the authoritative sources later, materialize the new files and run:
 
 ```bash
 pnpm assets:import-user -- \
@@ -13,4 +13,4 @@ pnpm assets:import-user -- \
   --logo-dark /path/to/logo-dark.png
 ```
 
-The importer normalizes web/mobile outputs, keeps an immutable source copy and records SHA-256 provenance in the public asset manifest.
+The importer normalizes web/mobile outputs, preserves immutable source copies, and records hashes. Execution identifiers such as token mints and program IDs never belong in this visual registry.

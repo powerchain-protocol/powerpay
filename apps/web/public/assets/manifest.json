@@ -1,8 +1,8 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "authoritativeAttachmentsRegistered": true,
   "authoritativeSourceManifest": "assets/source/user-brand/manifest.json",
-  "installationState": "registered-awaiting-binary-materialization",
+  "installationState": "installed",
   "owned": {
     "brandMark": {
       "path": "/assets/brand/powerpay-mark-green.png",
@@ -11,32 +11,79 @@
         "white": "/assets/brand/powerpay-mark-white.png",
         "dark": "/assets/brand/powerpay-mark-dark.png"
       },
-      "provenance": "uploaded-derived-fallback",
-      "authoritativeAttachment": "file_00000000042481f4bda4f6b8e5017789",
-      "note": "The exact logo-green/logo-white/logo-dark uploads are registered as authoritative. Current served bytes remain a build-safe fallback until scripts/import-user-brand-assets.mjs is run with materialized originals."
+      "provenance": "user-upload-authoritative",
+      "source": {
+        "originalName": "logo-green.png",
+        "storedPath": "assets/source/user-brand/originals/logoGreen.png",
+        "sha256": "189dd12ceb6bed89a72709eee5f34fc682b00ba25164a98f282a3a4ea1c143d1",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "attachmentFileId": "file_00000000f22881f6ba1084a912471e86"
+      },
+      "variantSources": {
+        "white": {
+          "originalName": "logo-white.png",
+          "storedPath": "assets/source/user-brand/originals/logoWhite.png",
+          "sha256": "40b039978d500f8d95ea767f249adae32932ffdad12e5fdb92633228cbe1cb03",
+          "width": 1024,
+          "height": 1024,
+          "format": "png",
+          "attachmentFileId": "file_00000000b6a081f6b6ef031a0f05edd5"
+        },
+        "dark": {
+          "originalName": "logo-dark.png",
+          "storedPath": "assets/source/user-brand/originals/logoDark.png",
+          "sha256": "ec98e88754dc0fcc1e9ed6a81c208f3e298b560f0e4d463232f600a98d708deb",
+          "width": 1024,
+          "height": 1024,
+          "format": "png",
+          "attachmentFileId": "file_00000000daec820c8bdde912c3884b4e"
+        }
+      }
     },
     "pwrcMark": {
       "path": "/assets/tokens/pwrc-mark.png",
       "vector": "/assets/tokens/pwrc-mark.svg",
-      "provenance": "uploaded-derived-fallback",
-      "source": [
-        "assets/source/powerchain/icons/energy.png",
-        "assets/source/powerchain/icons/token.png"
-      ]
+      "provenance": "user-upload-authoritative",
+      "source": {
+        "originalName": "logo-dark.png",
+        "storedPath": "assets/source/user-brand/originals/logoDark.png",
+        "sha256": "ec98e88754dc0fcc1e9ed6a81c208f3e298b560f0e4d463232f600a98d708deb",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "attachmentFileId": "file_00000000daec820c8bdde912c3884b4e"
+      },
+      "note": "Dense PWRC UI mark uses the supplied dark PowerChain symbol; detailed coin artwork is reserved for >=40px."
     },
     "pwrcCoin": {
       "path": "/assets/tokens/pwrc-coin.png",
       "retina": "/assets/tokens/pwrc-coin@2x.png",
-      "provenance": "uploaded-derived-fallback",
-      "authoritativeAttachment": "file_00000000efe881f4b7b58f11d1aba558",
-      "note": "pwrc.jpeg is the authoritative premium PWRC coin source; import is pending exact binary materialization."
+      "provenance": "user-upload-authoritative",
+      "source": {
+        "originalName": "pwrc.jpeg",
+        "storedPath": "assets/source/user-brand/originals/pwrc.jpeg",
+        "sha256": "cdf48033160ef24b4288e9deac0d536cd6fb0f800f1f70eced13422934219932",
+        "width": 1254,
+        "height": 1254,
+        "format": "jpeg",
+        "attachmentFileId": "file_000000000f4c81f49c50f9fc21e7e5ba"
+      }
     },
     "wpwrcCoin": {
       "path": "/assets/tokens/wpwrc-coin.png",
       "retina": "/assets/tokens/wpwrc-coin@2x.png",
-      "provenance": "uploaded-derived-fallback",
-      "authoritativeAttachment": "file_00000000832481f48bd3f73bb2dacf54",
-      "note": "wpwrc.jpeg is the authoritative wPWRC coin source; wPWRC remains a distinct Sui visual identity."
+      "provenance": "user-upload-authoritative",
+      "source": {
+        "originalName": "wpwrc.jpeg",
+        "storedPath": "assets/source/user-brand/originals/wpwrc.jpeg",
+        "sha256": "85b4569a2d8b49d22d95c5fed9c6278caf93fa892b73bd448a44a6ca4fbfc0a3",
+        "width": 1254,
+        "height": 1254,
+        "format": "jpeg",
+        "attachmentFileId": "file_00000000ac8881f4a4d2d90f6186e25a"
+      }
     }
   },
   "external": {

@@ -1,0 +1,51 @@
+{
+  "installedAt": "2026-08-28T15:02:22.906402+00:00",
+  "sourceManifestVersion": "1.0.0",
+  "sources": {
+    "pwrc": {
+      "originalName": "pwrc.jpeg",
+      "storedPath": "assets/source/user-brand/originals/pwrc.jpeg",
+      "sha256": "cdf48033160ef24b4288e9deac0d536cd6fb0f800f1f70eced13422934219932",
+      "width": 1254,
+      "height": 1254,
+      "format": "jpeg",
+      "attachmentFileId": "file_000000000f4c81f49c50f9fc21e7e5ba"
+    },
+    "wpwrc": {
+      "originalName": "wpwrc.jpeg",
+      "storedPath": "assets/source/user-brand/originals/wpwrc.jpeg",
+      "sha256": "85b4569a2d8b49d22d95c5fed9c6278caf93fa892b73bd448a44a6ca4fbfc0a3",
+      "width": 1254,
+      "height": 1254,
+      "format": "jpeg",
+      "attachmentFileId": "file_00000000ac8881f4a4d2d90f6186e25a"
+    },
+    "logoGreen": {
+      "originalName": "logo-green.png",
+      "storedPath": "assets/source/user-brand/originals/logoGreen.png",
+      "sha256": "189dd12ceb6bed89a72709eee5f34fc682b00ba25164a98f282a3a4ea1c143d1",
+      "width": 1024,
+      "height": 1024,
+      "format": "png",
+      "attachmentFileId": "file_00000000f22881f6ba1084a912471e86"
+    },
+    "logoWhite": {
+      "originalName": "logo-white.png",
+      "storedPath": "assets/source/user-brand/originals/logoWhite.png",
+      "sha256": "40b039978d500f8d95ea767f249adae32932ffdad12e5fdb92633228cbe1cb03",
+      "width": 1024,
+      "height": 1024,
+      "format": "png",
+      "attachmentFileId": "file_00000000b6a081f6b6ef031a0f05edd5"
+    },
+    "logoDark": {
+      "originalName": "logo-dark.png",
+      "storedPath": "assets/source/user-brand/originals/logoDark.png",
+      "sha256": "ec98e88754dc0fcc1e9ed6a81c208f3e298b560f0e4d463232f600a98d708deb",
+      "width": 1024,
+      "height": 1024,
+      "format": "png",
+      "attachmentFileId": "file_00000000daec820c8bdde912c3884b4e"
+    }
+  }
+}

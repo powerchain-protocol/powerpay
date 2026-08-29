@@ -17,7 +17,8 @@
     "@powerpay/qr": "workspace:*",
     "@powerpay/security": "workspace:*",
     "@powerpay/services": "workspace:*",
-    "@powerpay/capabilities": "workspace:*"
+    "@powerpay/capabilities": "workspace:*",
+    "@powerpay/api-contract": "workspace:*"
   },
   "devDependencies": {
     "typescript": "latest"

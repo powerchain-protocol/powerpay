@@ -11,7 +11,8 @@
   "dependencies": {
     "@powerpay/backend": "workspace:*",
     "@powerpay/chain-adapters": "workspace:*",
-    "@powerpay/services": "workspace:*"
+    "@powerpay/services": "workspace:*",
+    "@powerpay/api-contract": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "latest",

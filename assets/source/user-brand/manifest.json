@@ -1,31 +1,31 @@
 {
   "version": "1.0.0",
-  "status": "authoritative-attachments-registered",
-  "note": "These attachment IDs are the authoritative PowerPay/PowerChain brand sources. Run scripts/import-user-brand-assets.mjs with the materialized source paths to install exact bytes. Existing generated visual files remain build-safe fallbacks until import succeeds.",
+  "status": "authoritative-assets-installed-from-current-upload",
+  "note": "Current-conversation binaries are mounted and installed as the canonical PowerPay/PWRC visual sources.",
   "sources": {
     "pwrc": {
       "filename": "pwrc.jpeg",
-      "fileId": "file_00000000efe881f4b7b58f11d1aba558",
+      "fileId": "file_000000000f4c81f49c50f9fc21e7e5ba",
       "role": "PWRC premium coin"
     },
     "wpwrc": {
       "filename": "wpwrc.jpeg",
-      "fileId": "file_00000000832481f48bd3f73bb2dacf54",
+      "fileId": "file_00000000ac8881f4a4d2d90f6186e25a",
       "role": "wPWRC premium coin"
     },
     "logoGreen": {
       "filename": "logo-green.png",
-      "fileId": "file_00000000042481f4bda4f6b8e5017789",
+      "fileId": "file_00000000f22881f6ba1084a912471e86",
       "role": "PowerPay/PowerChain green mark"
     },
     "logoWhite": {
       "filename": "logo-white.png",
-      "fileId": "file_00000000122c81f4b9f7859d45e9c8e9",
+      "fileId": "file_00000000b6a081f6b6ef031a0f05edd5",
       "role": "PowerPay/PowerChain white mark"
     },
     "logoDark": {
       "filename": "logo-dark.png",
-      "fileId": "file_00000000444c81f49e511b1bf64ee606",
+      "fileId": "file_00000000daec820c8bdde912c3884b4e",
       "role": "PowerPay/PowerChain dark mark"
     }
   }

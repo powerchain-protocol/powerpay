@@ -8,6 +8,8 @@ import { usePowerPayAuth } from '@/providers/AuthProvider';
 
 export default function ProfileScreen() {
   const auth = usePowerPayAuth();
+  const solanaCluster = process.env.EXPO_PUBLIC_SOLANA_CLUSTER === 'mainnet-beta' ? 'Mainnet Beta' : 'Devnet';
+  const suiNetwork = process.env.EXPO_PUBLIC_SUI_NETWORK === 'mainnet' ? 'Mainnet' : process.env.EXPO_PUBLIC_SUI_NETWORK === 'testnet' ? 'Testnet' : 'Devnet';
   return (
     <Screen>
       <PageHeader title="Profile & Settings" />
@@ -38,11 +40,13 @@ export default function ProfileScreen() {
 
       <Text style={styles.sectionTitle}>Networks</Text>
       <View style={styles.card}>
-        <Row icon="radio-outline" title="Solana" subtitle="Mainnet · PowerPay RPC (Helius)" />
+        <Row icon="radio-outline" title="Solana" subtitle={`${solanaCluster} · PowerPay managed RPC`} />
         <Divider />
         <Row icon="options-outline" title="Custom RPC" subtitle="Configure and health-check your endpoint" onPress={() => router.push('/profile/network/solana')} />
         <Divider />
-        <Row icon="git-network-outline" title="Sui" subtitle="Enabled" />
+        <Row icon="git-network-outline" title="Sui" subtitle={`${suiNetwork} · Sui RPC`} />
+        <Divider />
+        <Row icon="pulse-outline" title="System status" subtitle="RPC, providers and runtime readiness" onPress={() => router.push('/profile/system')} />
       </View>
 
       <Text style={styles.sectionTitle}>Account</Text>

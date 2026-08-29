@@ -20,6 +20,14 @@ export class HeliusClient {
     return body.result;
   }
 
+  async getTokenSupply(mint: string, commitment: 'processed' | 'confirmed' | 'finalized' = 'confirmed') {
+    return this.rpc<{ value: { amount: string; decimals: number; uiAmount: number | null; uiAmountString: string } }>('getTokenSupply', [mint, { commitment }]);
+  }
+
+  async getAccountInfo(address: string, encoding: 'base64' | 'jsonParsed' = 'jsonParsed') {
+    return this.rpc<unknown>('getAccountInfo', [address, { encoding, commitment: 'confirmed' }]);
+  }
+
   async getTransfersByAddress(address: string, options: Record<string, unknown> = {}) {
     return this.rpc<unknown>('getTransfersByAddress', [address, options]);
   }

@@ -3,27 +3,9 @@ import { MOBILE_ASSETS } from '@/assets';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PowerPayLogo } from '@/components/PowerPayLogo';
-import { BrandMark } from '@/components/BrandMark';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { colors, radius } from '@/styles/theme';
+import { colors } from '@/styles/theme';
+import { useResponsive } from '@/hooks/useResponsive';
 
-export default function WelcomeScreen() {
-  return (
-    <SafeAreaView style={styles.root}>
-      <View style={styles.brand}><BrandMark size={34} /><PowerPayLogo size={32} /></View>
-      <View style={styles.hero}>
-        <View style={styles.visual}><Image source={MOBILE_ASSETS.illustrations.marketplace} resizeMode="cover" style={styles.image} /></View>
-        <Text style={styles.title}>Payments without borders.</Text>
-        <Text style={styles.subtitle}>Scan local shops, pay with USDC, receive EURC and move digital value across PowerPay's governed Solana and Sui rails.</Text>
-      </View>
-      <View style={styles.footer}>
-        <PrimaryButton label="Get started" onPress={() => router.push('/get-started')} />
-        <Pressable style={styles.signInButton} onPress={() => router.push('/sign-in')}><Text style={styles.signIn}>I already have an account</Text></Pressable>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.canvas, paddingHorizontal: 20 }, brand: { paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 8 }, hero: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 2 }, visual: { width: '100%', maxWidth: 390, aspectRatio: 1.42, borderRadius: radius.card, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: '#E7F2EB', marginBottom: 26 }, image: { width: '100%', height: '100%' }, title: { color: colors.text, fontSize: 34, fontWeight: '700', letterSpacing: -1.1, textAlign: 'center', maxWidth: 350 }, subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, textAlign: 'center', maxWidth: 350, marginTop: 12 }, footer: { paddingBottom: 20 }, signInButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center', marginTop: 5 }, signIn: { color: colors.primary, textAlign: 'center', fontSize: 13, fontWeight: '700' },
-});
+export default function WelcomeScreen(){const r=useResponsive();return <SafeAreaView style={styles.root}><View style={[styles.shell,{maxWidth:r.isTablet||r.isLargeTablet?780:440,paddingHorizontal:r.pagePadding}]}><View style={styles.brand}><PowerPayLogo size={28}/><Text style={styles.brandMeta}>USDC-first payments</Text></View><View style={styles.hero}><View style={[styles.visual,r.isTablet&&styles.visualTablet]}><Image source={MOBILE_ASSETS.illustrations.mobileShowcase} resizeMode="cover" style={styles.image}/><View style={styles.visualBadge}><Text>PowerPay Mobile</Text></View></View><Text style={[styles.title,r.isSmallPhone&&styles.titleSmall]}>Payments without borders.</Text><Text style={styles.subtitle}>Scan local merchants, pay with USDC, receive funds and approve every on-chain action from one focused wallet experience.</Text><View style={styles.proofRow}><View><Text style={styles.proofValue}>USDC</Text><Text style={styles.proofLabel}>Default</Text></View><View><Text style={styles.proofValue}>2%</Text><Text style={styles.proofLabel}>Service fee</Text></View><View><Text style={styles.proofValue}>Wallet</Text><Text style={styles.proofLabel}>Authorizes</Text></View></View></View><View style={styles.footer}><PrimaryButton label="Get started" onPress={()=>router.push('/get-started')}/><Pressable style={styles.signInButton} onPress={()=>router.push('/sign-in')}><Text style={styles.signIn}>I already have an account</Text></Pressable></View></View></SafeAreaView>}
+const styles=StyleSheet.create({root:{flex:1,backgroundColor:colors.canvas},shell:{width:'100%',alignSelf:'center',flex:1},brand:{paddingTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'},brandMeta:{fontSize:9,color:colors.muted,fontWeight:'700'},hero:{flex:1,justifyContent:'center',alignItems:'center'},visual:{width:'100%',aspectRatio:1.48,borderRadius:24,overflow:'hidden',backgroundColor:'#E7F2EB',marginBottom:26,shadowColor:'#0A120D',shadowOpacity:.08,shadowRadius:24,shadowOffset:{width:0,height:12}},visualTablet:{aspectRatio:2.05},image:{width:'100%',height:'100%'},visualBadge:{position:'absolute',left:14,bottom:14,paddingHorizontal:10,height:28,borderRadius:10,backgroundColor:'rgba(255,255,255,.9)',justifyContent:'center'},title:{color:colors.text,fontSize:36,fontWeight:'700',letterSpacing:-1.3,textAlign:'center',maxWidth:380},titleSmall:{fontSize:31},subtitle:{color:colors.muted,fontSize:14,lineHeight:21,textAlign:'center',maxWidth:380,marginTop:11},proofRow:{width:'100%',marginTop:22,flexDirection:'row',gap:8},proofValue:{color:colors.text,fontSize:13,fontWeight:'800',textAlign:'center'},proofLabel:{color:colors.muted,fontSize:8,textAlign:'center',marginTop:2},footer:{paddingBottom:18},signInButton:{minHeight:48,alignItems:'center',justifyContent:'center',marginTop:4},signIn:{color:colors.primary,fontSize:12,fontWeight:'700'}});

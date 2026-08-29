@@ -13,7 +13,8 @@
     "ios:native": "expo run:ios",
     "android:native": "expo run:android",
     "web:clear": "expo start --web --clear",
-    "doctor": "expo-doctor"
+    "doctor": "expo-doctor",
+    "ios:simulator:restart": "bash ../../scripts/restart-ios-simulator.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "latest",
@@ -21,13 +22,13 @@
     "@powerpay/solana": "workspace:*",
     "@powerpay/web3-icons": "workspace:*",
     "@react-native-async-storage/async-storage": "latest",
-    "expo": "^57.0.0",
-    "expo-camera": "latest",
+    "expo": "57.0.17",
+    "expo-camera": "57.0.4",
     "expo-crypto": "latest",
     "expo-haptics": "latest",
     "expo-linking": "latest",
     "expo-local-authentication": "latest",
-    "expo-router": "^57.0.17",
+    "expo-router": "57.0.17",
     "expo-secure-store": "latest",
     "expo-status-bar": "latest",
     "react": "19.2.3",
@@ -55,10 +56,13 @@
     "react-native-web": "^0.21.2",
     "@expo/metro-runtime": "^57.0.14",
     "expo-constants": "~57.0.8",
-    "react-native-screens": "4.26.0"
+    "react-native-screens": "4.26.0",
+    "@powerpay/api-client": "workspace:*",
+    "@powerpay/api-contract": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "@expo/cli": "57.0.18"
   }
 }

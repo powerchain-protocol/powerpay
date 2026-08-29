@@ -1,0 +1,2 @@
+import type { ReactNode } from 'react';
+export function LegalPage({ eyebrow, title, updated = 'August 28, 2026', children }: { eyebrow: string; title: string; updated?: string; children: ReactNode }) { return <main className="legal-page"><header><span className="section-kicker">{eyebrow}</span><h1>{title}</h1><p>Last updated {updated}</p></header><article className="legal-copy">{children}</article></main>; }

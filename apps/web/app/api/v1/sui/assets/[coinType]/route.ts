@@ -1,0 +1,9 @@
+import { NextRequest } from 'next/server';
+import { proxyPowerPayGet } from '@/lib/powerpay-read-proxy';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+type Context = { params: Promise<{ coinType: string }> };
+export async function GET(request: NextRequest, context: Context) {
+  const { coinType } = await context.params;
+  return proxyPowerPayGet(request, `/api/v1/sui/assets/${encodeURIComponent(coinType)}`);
+}

@@ -3,12 +3,13 @@ export interface PriceQuote {
   quote: 'USD' | 'EUR';
   price: string;
   confidence?: string;
-  source: 'pyth' | 'coingecko' | 'fixed-stablecoin';
+  source: 'pyth' | 'coingecko' | 'coinmarketcap' | 'fixed-stablecoin';
   observedAt: string;
   publishTime?: number;
   feedId?: string;
   transactional: boolean;
   expiresAt: string;
+  metadata?: Record<string, string | number | boolean | null>;
 }
 
 export interface PriceProvider {
@@ -43,6 +44,8 @@ export class PythHermesProvider implements PriceProvider {
     private readonly hermesUrl: string,
     private readonly feedIds: Record<string, string>,
     private readonly policy: OracleValidationPolicy = DEFAULT_ORACLE_POLICY,
+    private readonly apiKey?: string,
+    private readonly timeoutMs = 8_000,
   ) {}
 
   async getPrice(input: { base: string; quote: 'USD' | 'EUR' }): Promise<PriceQuote> {
@@ -51,10 +54,13 @@ export class PythHermesProvider implements PriceProvider {
     if (!feedId) throw new Error(`No Pyth feed configured for ${input.base}`);
     const url = new URL('/v2/updates/price/latest', this.hermesUrl);
     url.searchParams.append('ids[]', feedId);
-    const response = await fetch(url, { headers: { accept: 'application/json' } });
+    const headers: Record<string, string> = { accept: 'application/json' };
+    if (this.apiKey) headers.authorization = `Bearer ${this.apiKey}`;
+    const response = await fetchWithTimeout(url, { headers }, this.timeoutMs);
     if (!response.ok) throw new Error(`Pyth Hermes HTTP ${response.status}`);
-    const body = await response.json() as { parsed?: Array<{ price?: { price?: string; conf?: string; expo?: number; publish_time?: number } }> };
-    const item = body.parsed?.[0]?.price;
+    const body = await response.json() as { parsed?: Array<{ price?: { price?: string; conf?: string; expo?: number; publish_time?: number }; metadata?: { slot?: number } }> };
+    const parsed = body.parsed?.[0];
+    const item = parsed?.price;
     if (!item?.price || item.expo === undefined || item.publish_time === undefined) throw new Error('Pyth response missing price data');
     const scale = Math.pow(10, item.expo);
     const price = String(Number(item.price) * scale);
@@ -71,6 +77,7 @@ export class PythHermesProvider implements PriceProvider {
       feedId,
       transactional: true,
       expiresAt: new Date(Date.now() + this.policy.quoteTtlSeconds * 1000).toISOString(),
+      ...(typeof parsed?.metadata?.slot === 'number' ? { metadata: { slot: parsed.metadata.slot } } : {}),
     };
     validatePriceQuote(quote, this.policy);
     return quote;
@@ -78,7 +85,7 @@ export class PythHermesProvider implements PriceProvider {
 }
 
 export class CoinGeckoReferenceProvider implements PriceProvider {
-  constructor(private readonly baseUrl = 'https://api.coingecko.com/api/v3', private readonly apiKey?: string) {}
+  constructor(private readonly baseUrl = 'https://api.coingecko.com/api/v3', private readonly apiKey?: string, private readonly timeoutMs = 8_000) {}
   async getPrice(input: { base: string; quote: 'USD' | 'EUR' }): Promise<PriceQuote> {
     const ids: Record<string, string> = { SOL: 'solana', SUI: 'sui', USDC: 'usd-coin', EURC: 'euro-coin' };
     const id = ids[input.base];
@@ -86,15 +93,56 @@ export class CoinGeckoReferenceProvider implements PriceProvider {
     const url = new URL('/simple/price', this.baseUrl);
     url.searchParams.set('ids', id);
     url.searchParams.set('vs_currencies', input.quote.toLowerCase());
+    url.searchParams.set('include_last_updated_at', 'true');
     const headers: Record<string, string> = { accept: 'application/json' };
     if (this.apiKey) headers['x-cg-pro-api-key'] = this.apiKey;
-    const response = await fetch(url, { headers });
+    const response = await fetchWithTimeout(url, { headers }, this.timeoutMs);
     if (!response.ok) throw new Error(`CoinGecko HTTP ${response.status}`);
     const body = await response.json() as Record<string, Record<string, number>>;
     const value = body[id]?.[input.quote.toLowerCase()];
     if (typeof value !== 'number' || value <= 0) throw new Error('CoinGecko response missing price');
-    const observedAt = new Date().toISOString();
+    const updatedAt = body[id]?.last_updated_at;
+    const observedAt = typeof updatedAt === 'number' && updatedAt > 0 ? new Date(updatedAt * 1000).toISOString() : new Date().toISOString();
     return { base: input.base, quote: input.quote, price: String(value), source: 'coingecko', observedAt, transactional: false, expiresAt: new Date(Date.now() + 60_000).toISOString() };
+  }
+}
+
+export class CoinMarketCapReferenceProvider implements PriceProvider {
+  constructor(private readonly baseUrl = 'https://pro-api.coinmarketcap.com', private readonly apiKey?: string, private readonly timeoutMs = 8_000) {}
+
+  async getPrice(input: { base: string; quote: 'USD' | 'EUR' }): Promise<PriceQuote> {
+    const symbol = input.base.toUpperCase();
+    const url = new URL(this.apiKey ? '/v3/cryptocurrency/quotes/latest' : '/public-api/v3/cryptocurrency/quotes/latest', this.baseUrl);
+    url.searchParams.set('symbol', symbol);
+    url.searchParams.set('convert', input.quote);
+    const headers: Record<string, string> = { accept: 'application/json' };
+    if (this.apiKey) headers['X-CMC_PRO_API_KEY'] = this.apiKey;
+    const response = await fetchWithTimeout(url, { headers }, this.timeoutMs);
+    if (!response.ok) throw new Error(`CoinMarketCap HTTP ${response.status}`);
+    const body = await response.json() as {
+      data?: Array<{ id?: number; symbol?: string; last_updated?: string; quote?: Record<string, { price?: number; volume_24h?: number; market_cap?: number; percent_change_24h?: number; last_updated?: string }> }> | Record<string, unknown>;
+    };
+    const records = Array.isArray(body.data) ? body.data : Object.values(body.data ?? {}).flatMap((value) => Array.isArray(value) ? value : [value]) as Array<any>;
+    const item = records.find((entry) => entry && typeof entry === 'object' && String(entry.symbol || '').toUpperCase() === symbol) ?? records[0];
+    const market = item?.quote?.[input.quote];
+    const price = market?.price;
+    if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) throw new Error('CoinMarketCap response missing price');
+    const observedAt = typeof market?.last_updated === 'string' ? market.last_updated : typeof item?.last_updated === 'string' ? item.last_updated : new Date().toISOString();
+    return {
+      base: input.base,
+      quote: input.quote,
+      price: String(price),
+      source: 'coinmarketcap',
+      observedAt,
+      transactional: false,
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+      metadata: {
+        id: typeof item?.id === 'number' ? item.id : null,
+        volume24h: typeof market?.volume_24h === 'number' ? market.volume_24h : null,
+        marketCap: typeof market?.market_cap === 'number' ? market.market_cap : null,
+        percentChange24h: typeof market?.percent_change_24h === 'number' ? market.percent_change_24h : null,
+      },
+    };
   }
 }
 
@@ -104,5 +152,19 @@ export class FixedStablecoinProvider implements PriceProvider {
     if (!supported) throw new Error('Fixed stablecoin provider only supports USDC/USD or EURC/EUR');
     const now = new Date();
     return { base: input.base, quote: input.quote, price: '1', source: 'fixed-stablecoin', observedAt: now.toISOString(), transactional: true, expiresAt: new Date(now.getTime() + 30_000).toISOString() };
+  }
+}
+
+
+async function fetchWithTimeout(input: URL | string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') throw new Error(`Market provider timed out after ${timeoutMs}ms`);
+    throw error;
+  } finally {
+    clearTimeout(timer);
   }
 }

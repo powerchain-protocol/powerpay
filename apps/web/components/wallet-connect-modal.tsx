@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { WalletIcon } from '@powerpay/ui';
 
-type WalletKind = 'phantom' | 'solflare' | 'backpack';
+export type WalletKind = 'phantom' | 'solflare' | 'backpack';
 
 export interface BrowserSolanaProvider {
   publicKey?: { toBase58(): string };
@@ -27,6 +27,18 @@ function providerFor(kind: WalletKind): BrowserSolanaProvider | undefined {
   if (kind === 'phantom') return window.phantom?.solana || (window.solana?.isPhantom ? window.solana : undefined);
   if (kind === 'solflare') return window.solflare;
   return window.backpack?.solana;
+}
+
+
+export const WALLET_CONNECTED_EVENT = 'powerpay:browser-wallet-connected';
+export function connectedBrowserWallet(): { provider: BrowserSolanaProvider; address: string; kind: WalletKind } | null {
+  if (typeof window === 'undefined') return null;
+  for (const kind of ['phantom','solflare','backpack'] as WalletKind[]) {
+    const provider = providerFor(kind);
+    const address = provider?.publicKey?.toBase58?.();
+    if (provider?.isConnected && address) return { provider, address, kind };
+  }
+  return null;
 }
 
 export function WalletConnectModal({ open, onClose, onConnected }: { open: boolean; onClose(): void; onConnected(provider: BrowserSolanaProvider, address: string, kind: WalletKind): void }) {
@@ -60,7 +72,9 @@ export function WalletConnectModal({ open, onClose, onConnected }: { open: boole
       return;
     }
     const result = await provider.connect();
-    onConnected(provider, result.publicKey.toBase58(), kind);
+    const address = result.publicKey.toBase58();
+    onConnected(provider, address, kind);
+    window.dispatchEvent(new CustomEvent(WALLET_CONNECTED_EVENT, { detail: { address, kind } }));
     onClose();
   };
   return (

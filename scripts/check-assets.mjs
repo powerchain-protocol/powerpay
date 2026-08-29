@@ -101,11 +101,11 @@ for (const file of ['apps/mobile/assets/brand/app-icon.png', 'apps/mobile/assets
 
 const sourceManifest = JSON.parse(readFileSync(resolve(root, 'assets/source/user-brand/manifest.json'), 'utf8'));
 const expectedAttachments = {
-  pwrc: 'file_00000000efe881f4b7b58f11d1aba558',
-  wpwrc: 'file_00000000832481f48bd3f73bb2dacf54',
-  logoGreen: 'file_00000000042481f4bda4f6b8e5017789',
-  logoWhite: 'file_00000000122c81f4b9f7859d45e9c8e9',
-  logoDark: 'file_00000000444c81f49e511b1bf64ee606',
+  pwrc: 'file_000000000f4c81f49c50f9fc21e7e5ba',
+  wpwrc: 'file_00000000ac8881f4a4d2d90f6186e25a',
+  logoGreen: 'file_00000000f22881f6ba1084a912471e86',
+  logoWhite: 'file_00000000b6a081f6b6ef031a0f05edd5',
+  logoDark: 'file_00000000daec820c8bdde912c3884b4e',
 };
 for (const [key, id] of Object.entries(expectedAttachments)) {
   if (sourceManifest.sources?.[key]?.fileId !== id) throw new Error(`Authoritative source registration mismatch for ${key}.`);
